@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>文件上传插件</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <!-- jquery -->
+    <script type="text/javascript" src="others/jquery-3.5.1/jquery-3.5.1.min.js"></script>
+    <!-- font-awesome -->
+    <link rel="stylesheet" href="others/font-awesome-4.7.0/css/font-awesome.min.css">
+    <!-- jquery-file-upload -->
+    <link rel="stylesheet" href="css/jquery.fileupload.css" />
+    <script type="text/javascript" src="js/jquery.fileupload.js"></script>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      input {
+        -webkit-appearance: none;
+        background-color:#fff;
+        background-image: none;
+        border-radius: 4px;
+        border: 1px solid#dcdfe6;
+        box-sizing: border-box;
+        color:#606266;
+        display: inline-block;
+        font-size: inherit;
+        height: 40px;
+        line-height: 40px;
+        outline: none;
+        padding: 0 15px;
+        transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+        width: 100%;
+      }
+      input::placeholder {
+        color: #c0c4cc;
+      }
+      input:hover {
+        border-color: #c0c4cc;
+      }
+      input:focus {
+        outline: none;
+        border-color: #409eff;
+      }
+      button {
+        display: inline-block;
+        line-height: 1;
+        white-space: nowrap;
+        cursor: pointer;
+        background: #fff;
+        border: 1px solid #dcdfe6;
+        color: #606266;
+        -webkit-appearance: none;
+        text-align: center;
+        box-sizing: border-box;
+        outline: none;
+        margin: 0;
+        transition: .1s;
+        font-weight: 500;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        padding: 12px 20px;
+        font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
+        font-size: 14px;
+        border-radius: 4px;
+      }
+      button.btn-mini{
+        padding: 7px 15px;
+        font-size: 12px;
+        border-radius: 3px;
+      }
+      button:focus,
+      button:hover {
+        color: #409eff;
+        border-color: #c6e2ff;
+        background-color: #ecf5ff;
+      }
+      button:active {
+        color: #3a8ee6;
+        border-color: #3a8ee6;
+        outline: none;
+      }
+      code {
+        font-size: 16px;
+        font-weight: 400;
+        color: #666;
+      }
+      .content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 15px 15px 100px 15px;
+      }
+      .title {
+        padding-bottom: 15px;
+        border-bottom: 1px solid #DCDFE6;
+        text-align: center;
+      }
+      .tab {
+        margin-bottom: 50px;
+      }
+      .tab .body.border {
+        border: 1px solid #ebebeb;
+        border-radius: 3px;
+      }
+      .tab .body.border > :not(.meta) {
+        padding: 15px;
+      }
+      .tab .header .fa-angle-right {
+        transition-duration: .2s;
+      }
+      .tab .meta {
+        border-top: 1px solid #ebebeb;
+      }
+      .tab .code {
+        background-color: #fafafa;
+      }
+      .table {
+        table-layout:fixed;
+        width: 100%;
+        background-color: #fff;
+        font-size: 14px;
+        color: #606266;
+      }
+      .table th, 
+      .table td {
+        padding: 15px;
+        text-overflow: ellipsis;
+        vertical-align: middle;
+        text-align: left;
+        border-right: 1px solid #ebeef5;
+        border-bottom: 1px solid #ebeef5;
+      }
+      .table th {
+        text-align: left;
+        word-wrap:break-word;
+        color: #909399;
+        font-weight: 400;
+      }
+      .table td {
+        text-align: left;
+        word-wrap:break-word;
+        color: #606266;
+        font-weight: 400;
+      }
+      .table > thead tr:first-child th,
+      .table > thead tr:first-child td{
+        border-top: 1px solid #ebeef5;
+      }
+      .table th:first-child,
+      .table td:first-child {
+        border-left: 1px solid #ebeef5;
+      }
+    </style>
+	</head>
+	<body>
+    <div class="content">
+      
+      <h1 class="title">文件上传插件使用文档</h1>
+      
+      <div class="tab">
+        <div class="header">
+          <h3>简单使用</h3>
+        </div>
+        <div class="body border">
+          <div id="file-simple-upload"></div>
+          <div class="meta"></div>
+          <div class="code">
+            <code>
+              $(elem).fileUpload(option);
+            </code>
+          </div>
+        </div>
+      </div>
+      
+      <div class="tab">
+        <div class="header">
+          <h3>数据绑定</h3>
+        </div>
+        <div class="body">
+          <h5>通过设置option.bindElem实现</h5>
+          <input id="bind-elem" readonly="readonly" placeholder="已上传图片列表（JSON）"/>
+        </div>
+      </div>
+      
+      <div class="tab">
+        <div class="header">
+          <h3>方法调用</h3>
+        </div>
+        <div class="body">
+          <button id="choose" type="button">选择图片</button>
+          <button id="display-show" type="button">显示</button>
+          <button id="display-hide" type="button">隐藏</button>
+          <button id="upload-multiple" type="button">批量上传图片</button>
+          <button id="clear" type="button">清空</button>
+          <button id="push" type="button">插入图片</button>
+        </div>
+      </div>
+      
+      <div class="tab">
+        <div class="header">
+          <h3>参数 <button type="button" class="btn-mini collapse"><i class="fa fa-angle-right fa-rotate-90"></i></button></h3>
+        </div>
+        <div class="body">
+          <table id="opts-table" class="table" cellspacing="0" cellpadding="0" border="0">
+            <thead>
+              <tr>
+                <th width="15%">参数</th>
+                <th width="20%">说明</th>
+                <th width="15%">类型</th>
+                <th width="15%">可选值</th>
+                <th width="15%">默认值</th>
+                <th width="20%">@param</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>multiple</td>
+                <td>是否允许多图片上传</td>
+                <td>boolean</td>
+                <td>true/false</td>
+                <td>false</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>limit</td>
+                <td>图片上传数量限制，小于等于0时不限制</td>
+                <td>number</td>
+                <td>—</td>
+                <td>1</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>maxSize</td>
+                <td>图片大小限制，单位B</td>
+                <td>number</td>
+                <td>—</td>
+                <td>1024000</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>accept</td>
+                <td>文件类型</td>
+                <td>string</td>
+                <td>images（图片）、file（所有文件）、video（视频）、audio（音频）</td>
+                <td>images</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>acceptMime</td>
+                <td>文件选择框筛选出的文件类型
+                  <br/>用逗号隔开的 MIME 类型列表
+                </td>
+                <td>string</td>
+                <td>—</td>
+                <td>image/*</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>exts</td>
+                <td>允许上传的文件后缀
+                  <br/>用竖线隔开的 后缀 类型列表
+                </td>
+                <td>string</td>
+                <td>—</td>
+                <td>jpg|png|gif|bmp|jpeg</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>auto</td>
+                <td>选择图片后是否自动上传</td>
+                <td>boolean</td>
+                <td>true/false</td>
+                <td>true</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>url</td>
+                <td>服务端上传接口</td>
+                <td>string</td>
+                <td>—</td>
+                <td>—</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>headers</td>
+                <td>上传接口请求头</td>
+                <td>object</td>
+                <td>—</td>
+                <td>—</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>param</td>
+                <td>上传接口的额外参数</td>
+                <td>object</td>
+                <td>—</td>
+                <td>—</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>bindElem</td>
+                <td>数据绑定Jquery对象</td>
+                <td>object</td>
+                <td>—</td>
+                <td>—</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>data</td>
+                <td>预设文件列表</td>
+                <td>object</td>
+                <td>—</td>
+                <td>—</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>preview</td>
+                <td>是否启动图片预览插件</td>
+                <td>boolean</td>
+                <td>true/false</td>
+                <td>false</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>subscribeMessage</td>
+                <td>订阅消息
+                  <br/>用竖线隔开的消息类型列表
+                </td>
+                <td>string</td>
+                <td>log（普通）、info（信息）、warn（警告）、error（错误）</td>
+                <td>info|warn|error</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>msg</td>
+                <td>消息模板
+                <br/>详细参数见 <a href="#msg-opts-tab">消息模板参数</a>
+                </td>
+                <td>object</td>
+                <td>—</td>
+                <td>—</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>controls</td>
+                <td>控制器
+                <br/>详细参数见 <a href="#control-opts-tab">控制器参数</a>
+                </td>
+                <td>object</td>
+                <td>—</td>
+                <td>—</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>before-choose</td>
+                <td>选择文件前的钩子
+                </td>
+                <td>function(fileList)</td>
+                <td>—</td>
+                <td>—</td>
+                <td>fileList：文件列表</td>
+              </tr>
+              <tr>
+                <td>on-choose</td>
+                <td>选择文件的钩子
+                </td>
+                <td>function(elem, file, fileList)</td>
+                <td>—</td>
+                <td>—</td>
+                <td>elem：input节点
+                  <br/>file：当前选中文件
+                  <br/>fileList：文件列表
+                </td>
+              </tr>
+              <tr>
+                <td>on-upload</td>
+                <td>上传前的钩子
+                  <br/>可自定义上传实现
+                </td>
+                <td>function(index, fileList)</td>
+                <td>—</td>
+                <td>—</td>
+                <td>index：当前文件的索引
+                  <br/>fileList：文件列表
+                </td>
+              </tr>
+              <tr>
+                <td>on-done</td>
+                <td>上传完毕后的钩子
+                </td>
+                <td>function(status, res, index, fileList)</td>
+                <td>—</td>
+                <td>—</td>
+                <td>status：服务器响应状态码
+                  <br/>res：服务端响应信息
+                  <br/>index：当前文件的索引
+                  <br/>fileList：文件列表
+                </td>
+              </tr>
+              <tr>
+                <td>on-success</td>
+                <td>上传成功后的钩子
+                </td>
+                <td>function(res, index, fileList)</td>
+                <td>—</td>
+                <td>—</td>
+                <td>res：服务端响应信息
+                  <br/>index：当前文件的索引
+                  <br/>fileList：文件列表
+                </td>
+              </tr>
+              <tr>
+                <td>on-error</td>
+                <td>上传失败后的钩子
+                <td>function(status, res, index, fileList)</td>
+                <td>—</td>
+                <td>—</td>
+                <td>status：服务器响应状态码
+                  <br/>res：服务端响应信息
+                  <br/>index：当前文件的索引
+                  <br/>fileList：文件列表
+                </td>
+              </tr>
+              <tr>
+                <td>before-remove</td>
+                <td>删除前的钩子
+                <td>function(index, fileList)</td>
+                <td>—</td>
+                <td>—</td>
+                <td>index：当前文件的索引
+                  <br/>fileList：文件列表
+                </td>
+              </tr>
+              <tr>
+                <td>on-remove</td>
+                <td>删除后的钩子
+                <td>function(index, fileList)</td>
+                <td>—</td>
+                <td>—</td>
+                <td>index：当前文件的索引
+                  <br/>fileList：文件列表
+                </td>
+              </tr>
+              <tr>
+                <td>before-clear</td>
+                <td>清空前的钩子
+                <td>function(fileList)</td>
+                <td>—</td>
+                <td>—</td>
+                <td>fileList：文件列表</td>
+              </tr>
+              <tr>
+                <td>on-clear</td>
+                <td>清空后的钩子
+                <td>function()</td>
+                <td>—</td>
+                <td>—</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>on-change</td>
+                <td>数据变更的钩子
+                <td>function(fileList)</td>
+                <td>—</td>
+                <td>—</td>
+                <td>fileList：文件列表
+                </td>
+              </tr>
+              <tr>
+                <td>on-msg</td>
+                <td>提示消息的钩子
+                <td>function(level, msg, index, fileList)</td>
+                <td>—</td>
+                <td>—</td>
+                <td>level：消息级别（msg、warn、error）
+                  <br/>msg：提示信息
+                  <br/>index：当前文件的索引
+                  <br/>fileList：文件列表
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div class="tab" id="msg-opts-tab">
+        <div class="header">
+          <h3>消息模板参数 <button type="button" class="btn-mini collapse"><i class="fa fa-angle-right fa-rotate-90"></i></button></h3>
+        </div>
+        <div class="body">
+          <table class="table" cellspacing="0" cellpadding="0" border="0">
+            <thead>
+              <tr>
+                <th>参数</th>
+                <th>说明</th>
+                <th>类型</th>
+                <th>可选值</th>
+                <th>默认值</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>limit</td>
+                <td>文件数量超出上限时的提示消息
+                  <br/>可配置变量：{limit}（文件数量上限）
+                </td>
+                <td>string</td>
+                <td>—</td>
+                <td>最多可选择{limit}张图片</td>
+              </tr>
+              <tr>
+                <td>maxSize</td>
+                <td>文件大小超出上限时的提示消息
+                  <br/>可配置变量：{maxSize}（文件大小上限，单位B）
+                </td>
+                <td>string</td>
+                <td>—</td>
+                <td>文件大小超出</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div class="tab" id="control-opts-tab">
+        <div class="header">
+          <h3>控制器参数 <button type="button" class="btn-mini collapse"><i class="fa fa-angle-right fa-rotate-90"></i></button></h3>
+        </div>
+        <div class="body">
+          <table class="table" cellspacing="0" cellpadding="0" border="0">
+            <thead>
+              <tr>
+                <th>参数</th>
+                <th>说明</th>
+                <th>类型</th>
+                <th>可选值</th>
+                <th>默认值</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>hide</td>
+                <td>是否隐藏全部控制器</td>
+                <td>boolean</td>
+                <td>true/false</td>
+                <td>false</td>
+              </tr>
+              <tr>
+                <td>style</td>
+                <td>通用按钮样式</td>
+                <td>string</td>
+                <td>—</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>choose</td>
+                <td>选择文件按钮</td>
+                <td>boolean</td>
+                <td>true/false</td>
+                <td>true</td>
+              </tr>
+              <tr>
+                <td>choose-style</td>
+                <td>选择文件按钮样式</td>
+                <td>string</td>
+                <td>—</td>
+                <td>btn-primary btn-mini</td>
+              </tr>
+              <tr>
+                <td>choose-content</td>
+                <td>选择文件按钮内容</td>
+                <td>string</td>
+                <td>—</td>
+                <td>选择文件</td>
+              </tr>
+              <tr>
+                <td>display</td>
+                <td>显示隐藏按钮</td>
+                <td>boolean</td>
+                <td>true/false</td>
+                <td>false</td>
+              </tr>
+              <tr>
+                <td>display-style</td>
+                <td>显示隐藏按钮样式</td>
+                <td>string</td>
+                <td>—</td>
+                <td>btn-primary btn-mini</td>
+              </tr>
+              <tr>
+                <td>display-hide-content</td>
+                <td>隐藏按钮内容</td>
+                <td>string</td>
+                <td>—</td>
+                <td>隐藏</td>
+              </tr>
+              <tr>
+                <td>display-show-content</td>
+                <td>显示按钮内容</td>
+                <td>string</td>
+                <td>—</td>
+                <td>显示</td>
+              </tr>
+              <tr>
+                <td>upload-multiple</td>
+                <td>批量上传按钮</td>
+                <td>boolean</td>
+                <td>true/false</td>
+                <td>false</td>
+              </tr>
+              <tr>
+                <td>upload-multiple-style</td>
+                <td>批量上传按钮样式</td>
+                <td>string</td>
+                <td>—</td>
+                <td>btn-primary btn-mini</td>
+              </tr>
+              <tr>
+                <td>upload-multiple-content</td>
+                <td>批量上传按钮内容</td>
+                <td>string</td>
+                <td>—</td>
+                <td>批量上传</td>
+              </tr>
+              <tr>
+                <td>clear</td>
+                <td>清空按钮</td>
+                <td>boolean</td>
+                <td>true/false</td>
+                <td>false</td>
+              </tr>
+              <tr>
+                <td>clear-style</td>
+                <td>清空按钮样式</td>
+                <td>string</td>
+                <td>—</td>
+                <td>btn-danger btn-mini</td>
+              </tr>
+              <tr>
+                <td>clear-content</td>
+                <td>清空按钮内容</td>
+                <td>string</td>
+                <td>—</td>
+                <td>清空</td>
+              </tr>
+              <tr>
+                <td>upload</td>
+                <td>上传按钮</td>
+                <td>boolean</td>
+                <td>true/false</td>
+                <td>true</td>
+              </tr>
+              <tr>
+                <td>upload-style</td>
+                <td>上传按钮样式</td>
+                <td>string</td>
+                <td>—</td>
+                <td>btn-primary btn-super-mini</td>
+              </tr>
+              <tr>
+                <td>upload-content</td>
+                <td>上传按钮内容</td>
+                <td>string</td>
+                <td>—</td>
+                <td>上传</td>
+              </tr>
+              <tr>
+                <td>delete</td>
+                <td>删除按钮</td>
+                <td>boolean</td>
+                <td>true/false</td>
+                <td>true</td>
+              </tr>
+              <tr>
+                <td>delete-style</td>
+                <td>删除按钮样式</td>
+                <td>string</td>
+                <td>—</td>
+                <td>btn-danger btn-super-mini</td>
+              </tr>
+              <tr>
+                <td>delete-content</td>
+                <td>删除按钮内容</td>
+                <td>string</td>
+                <td>—</td>
+                <td>删除</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div class="tab">
+        <div class="header">
+          <h3>方法 <button type="button" class="btn-mini collapse"><i class="fa fa-angle-right fa-rotate-90"></i></button></h3>
+        </div>
+        <div class="body">
+          <table id="control-opts-table" class="table" cellspacing="0" cellpadding="0" border="0">
+            <thead>
+              <tr>
+                <th width="20%">方法名</th>
+                <th width="20%">说明</th>
+                <th width="30%">参数</th>
+                <th width="30%">示例</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>choose</td>
+                <td>选择文件
+                <td>—</td>
+                <td>$elem.fileUpload('choose');</td>
+              </tr>
+              <tr>
+                <td>display</td>
+                <td>显示/隐藏
+                <td>_display[boolean]：true显示/false隐藏</td>
+                <td>$elem.fileUpload('display', true);</td>
+              </tr>
+              <tr>
+                <td>upload</td>
+                <td>上传文件
+                <td>index[number]：文件索引</td>
+                <td>$elem.fileUpload('upload', index);</td>
+              </tr>
+              <tr>
+                <td>uploadMultiple</td>
+                <td>批量上传
+                <td>—</td>
+                <td>$elem.fileUpload('uploadMultiple');</td>
+              </tr>
+              <tr>
+                <td>remove</td>
+                <td>删除文件
+                <td>index[number]：文件索引</td>
+                <td>$elem.fileUpload('remove', index);</td>
+              </tr>
+              <tr>
+                <td>clear</td>
+                <td>清空文件
+                <td>—</td>
+                <td>$elem.fileUpload('clear');</td>
+              </tr>
+              <tr>
+                <td>push</td>
+                <td>添加文件
+                <td>fileList[array]：文件列表</td>
+                <td>$elem.fileUpload('push', fileList);</td>
+              </tr>
+              <tr>
+                <td>insert</td>
+                <td>插入文件
+                <td>fileList[array]：文件列表
+                  <br/>index[number]：插入位置。若index未设置（或index大于等于当前文件列表长度），则效果同push一致
+                </td>
+                <td>$elem.fileUpload('insert', fileList, 2);</td>
+              </tr>
+              <tr>
+                <td>update</td>
+                <td>更新文件状态
+                <td>index[number]：文件索引
+                  <br/>option[object]：更新属性
+                </td>
+                <td>$elem.fileUpload('update', index, option);</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <script>
+      $('.tab').on('click', '.collapse', function() {
+        const $i = $(this).children('i');
+        const _display = $i.hasClass('fa-rotate-90');
+        if (!_display) {
+          $i.addClass('fa-rotate-90');
+          $(this).closest('.tab').children('.body').slideDown(350);
+        } else {
+          $i.removeClass('fa-rotate-90');
+          $(this).closest('.tab').children('.body').slideUp(350);
+        }
+      });
+    </script>
+    <script>
+      // 简单调用
+      $('#file-simple-upload').fileUpload({
+        'auto': false,
+        // 上传前的钩子 return false可中断默认行为
+        'on-upload': function (index, fileList) {
+          console.log('on-upload', index, fileList);
+          $elem.fileUpload('update', index, {status: 200});
+          return false;
+        },
+        'on-msg': function (event, level, msg, index, fileList) {
+          alert(msg);
+        },
+      });
+      
+      // step-1 init
+      const $elem = $('#file-simple-upload');
+      const option = {
+          'multiple': true,
+          'limit': 6,
+          'maxSize': 1024000,
+          'acceptMime': 'image/*',
+          'exts': 'jpg|png',
+          'auto': false,
+          'url': 'http://local.dl.ermb123.com/group1/upload',
+          'param': {
+            'scene': 'public',
+            'output': 'json',
+          },
+          'headers': {},
+          'bindElem': $('#bind-elem'),
+          'data': [
+            {'src': 'http://127.0.0.1:8848/jquery-image-util/img/cat-1701156_1920.jpg'},
+            {'src': 'http://127.0.0.1:8848/jquery-image-util/img/cat-238394_1920.jpg'},
+          ],
+          'msg': {
+            'limit': '最多可选{limit}份文档',
+          },
+          'controls': {
+            'hide': false,
+            'style': '',
+            'choose': true,
+            'choose-style': '',
+            'choose-content': '<i class="fa fa-cloud-upload"></i> 选择文件',
+            'display': true,
+            'display-style': '',
+            'display-hide-content': '<i class="fa fa-eye-slash"></i>',
+            'display-show-content': '<i class="fa fa-eye"></i>',
+            'upload-multi': true,
+            'upload-multi-style': '',
+            'upload-multi-content': '<i class="fa fa-cloud-upload"></i>',
+            'clear': true,
+            'clear-style': '',
+            'clear-content': '<i class="fa fa-trash"></i>',
+            'upload-content': '<i class="fa fa-cloud-upload"></i>',
+            'delete-content': '<i class="fa fa-trash"></i>',
+          },
+          // 选择文件前的钩子 return false可中断默认行为
+          'before-choose': function (fileList) {
+            console.log('before-choose', fileList);
+          },
+          // 选择文件的钩子 return false可中断默认行为
+          'on-choose': function (elem, file, fileList) {
+            console.log('on-choose', elem, file, fileList);
+          },
+          // 上传前的钩子 return false可中断默认行为
+          'on-upload': function (index, fileList) {
+            console.log('on-upload', index, fileList);
+          },
+          // 上传完毕后的钩子
+          'on-done': function (status, res, index, fileList) {
+            console.log('on-done', status, res, index, fileList);
+          },
+          // 上传成功后的钩子
+          'on-success': function (res, index, fileList) {
+            console.log('on-success', res, index, fileList);
+          },
+          // 上传失败后的钩子
+          'on-error': function (status, res, index, fileList) {
+            console.log('on-error', status, res, index, fileList);
+          },
+          // 删除前的钩子
+          'before-remove': function (index, fileList) {
+            console.log('before-remove', index, fileList);
+          },
+          // 删除后的钩子
+          'on-remove': function (index, fileList) {
+            console.log('on-remove', index, fileList);
+          },
+          // 数据变更的钩子
+          'on-change': function (fileList) {
+            console.log('on-change', fileList);
+          },
+          // 提示消息的钩子
+          'on-msg': function (event, level, msg, index, fileList) {
+            console.log('on-msg', event, level, msg, index, fileList);
+          },
+          preview: true
+        }
+      //$elem.fileUpload(option);
+
+      // api
+      $('#choose').on('click', function() {
+        $elem.fileUpload('choose');
+      });
+      $('#display-show').on('click', function() {
+        $elem.fileUpload('display', true);
+      });
+      $('#display-hide').on('click', function() {
+        $elem.fileUpload('display', false);
+      });
+      $('#upload-multiple').on('click', function() {
+        $elem.fileUpload('uploadMultiple');
+      });
+      $('#clear').on('click', function() {
+        $elem.fileUpload('clear');
+      });
+      $('#push').on('click', function() {
+        $elem.fileUpload('push', ['http://127.0.0.1:8848/jquery-image-util/img/cat-1701156_1920.jpg', 'http://127.0.0.1:8848/jquery-image-util/img/cat-238394_1920.jpg'])
+      });
+    </script>
+	</body>
+</html>

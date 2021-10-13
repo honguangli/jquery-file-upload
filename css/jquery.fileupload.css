@@ -1,0 +1,387 @@
+.upload-files-box {}
+
+.upload-files-box>.upload-file-control {}
+
+.upload-files-box .input-upload-file {
+  display: none;
+}
+
+/* default */
+.upload-files-box .btn {
+  display: inline-block;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #dcdfe6;
+  color: #606266;
+  -webkit-appearance: none;
+  text-align: center;
+  box-sizing: border-box;
+  outline: none;
+  margin: 0;
+  transition: .1s;
+  font-weight: 500;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  padding: 12px 20px;
+  font-family: Helvetica Neue, Helvetica, PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, sans-serif;
+  font-size: 14px;
+  border-radius: 4px;
+}
+.upload-files-box .btn:focus,
+.upload-files-box .btn:hover {
+  color: #409eff;
+  border-color: #c6e2ff;
+  background-color: #ecf5ff;
+}
+.upload-files-box .btn:active {
+  color: #3a8ee6;
+  border-color: #3a8ee6;
+  outline: none;
+}
+.upload-files-box .btn.btn-plain:focus,
+.upload-files-box .btn.btn-plain:hover {
+  background:#fff;
+  border-color:#409eff;
+  color:#409eff;
+}
+.upload-files-box .btn.btn-plain.is-active,
+.upload-files-box .btn.btn-plain:active {
+  border-color:#3a8ee6;
+  color:#3a8ee6;
+}
+.upload-files-box .btn.btn-plain:active {
+  background:#fff;
+  outline: none;
+}
+/* primary */
+.upload-files-box .btn.btn-primary {
+  color: #fff;
+  background-color: #409eff;
+  border-color: #409eff;
+}
+.upload-files-box .btn.btn-primary:focus,
+.upload-files-box .btn.btn-primary:hover {
+  background:#66b1ff;
+  border-color:#66b1ff;
+  color:#fff;
+}
+.upload-files-box .btn.btn-primary.is-active,
+.upload-files-box .btn.btn-primary:active {
+  background: #3a8ee6;
+  border-color:#3a8ee6;
+  color:#fff;
+}
+.upload-files-box .btn.btn-primary:active {
+  outline: none;
+}
+.upload-files-box .btn.btn-primary.btn-plain {
+  color: #409eff;
+  background-color: #ecf5ff;
+  border-color: #b3d8ff;
+}
+.upload-files-box .btn.btn-primary.btn-plain:focus,
+.upload-files-box .btn.btn-primary.btn-plain:hover {
+  background:#409eff;
+  border-color:#409eff;
+  color:#fff;
+}
+.upload-files-box .btn.btn-primary.btn-plain:active {
+  background:#3a8ee6;
+  border-color:#3a8ee6;
+  color:#fff;
+  outline: none;
+}
+/* success */
+.upload-files-box .btn.btn-success {
+  color:#fff;
+  background-color:#67c23a;
+  border-color:#67c23a;
+}
+.upload-files-box .btn.btn-success:focus,
+.upload-files-box .btn.btn-success:hover {
+  background:#85ce61;
+  border-color:#85ce61;
+  color:#fff;
+}
+.upload-files-box .btn.btn-success.is-active,
+.upload-files-box .btn.btn-success:active {
+  background:#5daf34;
+  border-color:#5daf34;
+  color:#fff;
+}
+.upload-files-box .btn.btn-success:active {
+  outline: none;
+}
+.upload-files-box .btn.btn-success.btn-plain {
+  color: #67c23a;
+  background-color: #f0f9eb;
+  border-color: #c2e7b0;
+}
+.upload-files-box .btn.btn-success.btn-plain:focus,
+.upload-files-box .btn.btn-success.btn-plain:hover {
+  background:#67c23a;
+  border-color:#67c23a;
+  color:#fff;
+}
+.upload-files-box .btn.btn-success.btn-plain:active {
+  background:#5daf34;
+  border-color:#5daf34;
+  color:#fff;
+  outline: none;
+}
+/* info */
+.upload-files-box .btn.btn-info {
+  color:#fff;
+  background-color:#909399;
+  border-color:#909399;
+}
+.upload-files-box .btn.btn-info:focus,
+.upload-files-box .btn.btn-info:hover {
+  background:#a6a9ad;
+  border-color:#a6a9ad;
+  color:#fff;
+}
+.upload-files-box .btn.btn-info.is-active,
+.upload-files-box .btn.btn-info:active {
+  background:#82848a;
+  border-color:#82848a;
+  color:#fff;
+}
+.upload-files-box .btn.btn-info:active {
+  outline: none;
+}
+.upload-files-box .btn.btn-info.btn-plain {
+  color: #909399;
+  background-color: #f4f4f5;
+  border-color: #d3d4d6;
+}
+.upload-files-box .btn.btn-info.btn-plain:focus,
+.upload-files-box .btn.btn-info.btn-plain:hover {
+  background:#909399;
+  border-color:#909399;
+  color:#fff;
+}
+.upload-files-box .btn.btn-info.btn-plain:active {
+  background:#82848a;
+  border-color:#82848a;
+  color:#fff;
+  outline: none;
+}
+/* warn */
+.upload-files-box .btn.btn-warning {
+  color:#fff;
+  background-color:#e6a23c;
+  border-color:#e6a23c;
+}
+.upload-files-box .btn.btn-warning:focus,
+.upload-files-box .btn.btn-warning:hover {
+  background:#ebb563;
+  border-color:#ebb563;
+  color:#fff;
+}
+.upload-files-box .btn.btn-warning.is-active,
+.upload-files-box .btn.btn-warning:active {
+  background:#cf9236;
+  border-color:#cf9236;
+  color:#fff;
+}
+.upload-files-box .btn.btn-warning:active {
+  outline: none;
+}
+.upload-files-box .btn.btn-warning.btn-plain {
+  color: #e6a23c;
+  background-color: #fdf6ec;
+  border-color: #f5dab1;
+}
+.upload-files-box .btn.btn-warning.btn-plain:focus,
+.upload-files-box .btn.btn-warning.btn-plain:hover {
+  background:#e6a23c;
+  border-color:#e6a23c;
+  color:#fff;
+}
+.upload-files-box .btn.btn-warning.btn-plain:active {
+  background:#cf9236;
+  border-color:#cf9236;
+  color:#fff;
+  outline: none;
+}
+/* danger */
+.upload-files-box .btn.btn-danger {
+  color:#fff;
+  background-color:#f56c6c;
+  border-color:#f56c6c;
+}
+.upload-files-box .btn.btn-danger:focus,
+.upload-files-box .btn.btn-danger:hover {
+  background:#f78989;
+  border-color:#f78989;
+  color:#fff;
+}
+.upload-files-box .btn.btn-danger.is-active,
+.upload-files-box .btn.btn-danger:active {
+  background:#dd6161;
+  border-color:#dd6161;
+  color:#fff;
+}
+.upload-files-box .btn.btn-danger:active {
+  outline: none;
+}
+.upload-files-box .btn.btn-danger.btn-plain {
+  color: #f56c6c;
+  background-color: #fef0f0;
+  border-color: #fbc4c4;
+}
+.upload-files-box .btn.btn-danger.btn-plain:focus,
+.upload-files-box .btn.btn-danger.btn-plain:hover {
+  background:#f56c6c;
+  border-color:#f56c6c;
+  color:#fff;
+}
+.upload-files-box .btn.btn-danger.btn-plain:active {
+  background:#dd6161;
+  border-color:#dd6161;
+  color:#fff;
+  outline: none;
+}
+/* 按钮大小 */
+.upload-files-box .btn.btn-medium{
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 4px;
+}
+.upload-files-box .btn.btn-small{
+  padding: 9px 15px;
+  font-size: 12px;
+  border-radius: 3px;
+}
+.upload-files-box .btn.btn-mini{
+  padding: 7px 15px;
+  font-size: 12px;
+  border-radius: 3px;
+}
+.upload-files-box .btn.btn-super-mini{
+  padding: 5px 7px;
+  font-size: 10px;
+  border-radius: 2px;
+}
+/* 圆角按钮 */
+.upload-files-box .btn.btn-round {
+  border-radius: 20px;
+  padding: 12px 23px;
+}
+.upload-files-box .btn.btn-medium.btn-round {
+  padding: 10px 20px;
+}
+.upload-files-box .btn.btn-small.btn-round {
+  padding: 9px 15px;
+}
+.upload-files-box .btn.btn-mini.btn-round {
+  padding: 7px 15px;
+}
+.upload-files-box .btn.btn-super-mini.btn-round{
+  padding: 5px 7px;
+}
+/* 圆形按钮 */
+.upload-files-box .btn.btn-circle{
+  border-radius: 50%;
+  padding: 12px;
+}
+.upload-files-box .btn.btn-medium.btn-circle {
+  padding: 10px;
+}
+.upload-files-box .btn.btn-small.btn-circle {
+  padding: 9px;
+}
+.upload-files-box .btn.btn-mini.btn-circle {
+  padding: 7px;
+}
+.upload-files-box .btn.btn-super-mini.btn-circle {
+  padding: 5px;
+}
+/* 按钮边距 */
+.upload-files-box .btn+.btn {
+  margin-left: 10px;
+}
+.upload-files-box .btn.btn-super-mini+.btn.btn-super-mini {
+  margin-left: 5px;
+}
+/* 按钮组 */
+.upload-files-box .btn-group {
+  display: inline-block;
+  vertical-align: middle;
+}
+/* end 新版按钮 */
+
+.upload-files-box>.upload-files {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+}
+
+.upload-files-box .upload-file-item {
+  margin: 5px 10px 5px 0;
+  border: 1px solid #e0e0e0;
+  text-align: center;
+}
+
+.upload-files-box .upload-file-item:last-child {
+  margin-right: 0;
+}
+
+.upload-files-box .upload-file-item>.upload-image {
+  display: block;
+  width: 100px;
+  height: 75px;
+  margin: 1px;
+  cursor: pointer;
+  object-fit: cover;
+}
+
+.upload-files-box .upload-file-item>.upload-file-indicator {
+  border-top: 1px solid #eee;
+  padding: 2px 0;
+}
+
+.upload-files-box .upload-file-item>.upload-file-indicator>p {
+  margin: 0;
+  padding: 0;
+}
+
+.upload-files-box .upload-file-item>.upload-file-control {
+  margin: 2px;
+  border-top: 1px solid #eee;
+  text-align: right;
+}
+
+.upload-files-box .upload-default {
+  font-size: 10px;
+  color: #777;
+}
+
+.upload-files-box .upload-doing {
+  font-size: 10px;
+  color: #0b73b0;
+}
+
+.upload-files-box .upload-finish {
+  font-size: 10px;
+  color: #00a65a;
+}
+
+.upload-files-box .upload-success {
+  font-size: 10px;
+  color: #00a65a;
+}
+
+.upload-files-box .upload-failure {
+  font-size: 10px;
+  color: #f00;
+}
+
+.upload-files-box .upload-warning {
+  font-size: 10px;
+  color: #ffb800;
+}
