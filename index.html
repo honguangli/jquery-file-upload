@@ -55,7 +55,7 @@
         text-align: center;
         box-sizing: border-box;
         outline: none;
-        margin: 0;
+        margin: 0 0 10px 0;
         transition: .1s;
         font-weight: 500;
         -moz-user-select: none;
@@ -122,6 +122,8 @@
         background-color: #fff;
         font-size: 14px;
         color: #606266;
+        border-top: 1px solid #ebeef5;
+        border-left: 1px solid #ebeef5;
       }
       .table th, 
       .table td {
@@ -129,42 +131,51 @@
         text-overflow: ellipsis;
         vertical-align: middle;
         text-align: left;
+        word-wrap:break-word;
+        font-weight: 400;
         border-right: 1px solid #ebeef5;
         border-bottom: 1px solid #ebeef5;
       }
       .table th {
-        text-align: left;
-        word-wrap:break-word;
         color: #909399;
-        font-weight: 400;
       }
       .table td {
-        text-align: left;
-        word-wrap:break-word;
         color: #606266;
-        font-weight: 400;
       }
-      .table > thead tr:first-child th,
-      .table > thead tr:first-child td{
-        border-top: 1px solid #ebeef5;
-      }
-      .table th:first-child,
-      .table td:first-child {
-        border-left: 1px solid #ebeef5;
+      #file-upload {
+        width: 360px;
       }
     </style>
 	</head>
 	<body>
     <div class="content">
       
-      <h1 class="title">文件上传插件使用文档</h1>
+      <!-- text -->
+      <i class="file-icon"></i>
+      <a class="file-name">filename</a>
+      <i class="file-upload-icon">upload icon</i>
+      <i class="file-remove-icon">remove icon</i>
+      
+      <!-- picture -->
+      <img class="file-image"/>
+      <a class="file-name">filename</a>
+      <i class="file-upload-icon">upload icon</i>
+      <i class="file-remove-icon">remove icon</i>
+      
+      <!-- picture-card -->
+      <img class="file-image"/>
+      <a class="file-name">filename</a>
+      <i class="file-upload-icon">upload icon</i>
+      <i class="file-remove-icon">remove icon</i>
+      
+      <h1 class="title">文件上传插件说明文档</h1>
       
       <div class="tab">
         <div class="header">
           <h3>简单使用</h3>
         </div>
         <div class="body border">
-          <div id="file-simple-upload"></div>
+          <div id="file-upload"></div>
           <div class="meta"></div>
           <div class="code">
             <code>
@@ -180,7 +191,7 @@
         </div>
         <div class="body">
           <h5>通过设置option.bindElem实现</h5>
-          <input id="bind-elem" readonly="readonly" placeholder="已上传图片列表（JSON）"/>
+          <input id="bind-elem" readonly="readonly" placeholder="已上传文件数据（JSON）"/>
         </div>
       </div>
       
@@ -189,12 +200,16 @@
           <h3>方法调用</h3>
         </div>
         <div class="body">
-          <button id="choose" type="button">选择图片</button>
-          <button id="display-show" type="button">显示</button>
-          <button id="display-hide" type="button">隐藏</button>
-          <button id="upload-multiple" type="button">批量上传图片</button>
-          <button id="clear" type="button">清空</button>
-          <button id="push" type="button">插入图片</button>
+          <button id="event-choose" type="button">选择文件</button>
+          <button id="event-display-show" type="button">显示</button>
+          <button id="event-display-hide" type="button">隐藏</button>
+          <button id="event-upload" type="button">上传（第2个文件）</button>
+          <button id="event-upload-multiple" type="button">批量上传</button>
+          <button id="event-remove" type="button">删除（第2个文件）</button>
+          <button id="event-clear" type="button">清空</button>
+          <button id="event-push" type="button">追加文件</button>
+          <button id="event-insert" type="button">插入文件列表（第1个文件后）</button>
+          <button id="event-update" type="button">更新文件属性</button>
         </div>
       </div>
       
@@ -207,73 +222,61 @@
             <thead>
               <tr>
                 <th width="15%">参数</th>
-                <th width="20%">说明</th>
-                <th width="15%">类型</th>
-                <th width="15%">可选值</th>
+                <th width="30%">说明</th>
+                <th width="20%">类型</th>
+                <th width="20%">可选值</th>
                 <th width="15%">默认值</th>
-                <th width="20%">@param</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>multiple</td>
-                <td>是否允许多图片上传</td>
+                <td>是否允许多文件上传</td>
                 <td>boolean</td>
                 <td>true/false</td>
                 <td>false</td>
-                <td></td>
               </tr>
               <tr>
                 <td>limit</td>
-                <td>图片上传数量限制，小于等于0时不限制</td>
+                <td>文件上传数量限制，小于等于0时不限制</td>
                 <td>number</td>
                 <td>—</td>
                 <td>1</td>
-                <td></td>
               </tr>
               <tr>
                 <td>maxSize</td>
-                <td>图片大小限制，单位B</td>
+                <td>文件大小限制，单位B</td>
                 <td>number</td>
                 <td>—</td>
                 <td>1024000</td>
-                <td></td>
               </tr>
               <tr>
                 <td>accept</td>
-                <td>文件类型</td>
-                <td>string</td>
-                <td>images（图片）、file（所有文件）、video（视频）、audio（音频）</td>
-                <td>images</td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>acceptMime</td>
-                <td>文件选择框筛选出的文件类型
-                  <br/>用逗号隔开的 MIME 类型列表
-                </td>
+                <td>文件类型。正则表达式</td>
                 <td>string</td>
                 <td>—</td>
                 <td>image/*</td>
-                <td></td>
+              </tr>
+              <tr>
+                <td>acceptMime</td>
+                <td>文件选择框筛选出的文件类型。用逗号隔开的 MIME 类型列表</td>
+                <td>string</td>
+                <td>—</td>
+                <td>image/*</td>
               </tr>
               <tr>
                 <td>exts</td>
-                <td>允许上传的文件后缀
-                  <br/>用竖线隔开的 后缀 类型列表
-                </td>
+                <td>允许上传的文件后缀。正则表达式</td>
                 <td>string</td>
                 <td>—</td>
                 <td>jpg|png|gif|bmp|jpeg</td>
-                <td></td>
               </tr>
               <tr>
                 <td>auto</td>
-                <td>选择图片后是否自动上传</td>
+                <td>选择文件后是否自动上传</td>
                 <td>boolean</td>
                 <td>true/false</td>
                 <td>true</td>
-                <td></td>
               </tr>
               <tr>
                 <td>url</td>
@@ -281,7 +284,6 @@
                 <td>string</td>
                 <td>—</td>
                 <td>—</td>
-                <td></td>
               </tr>
               <tr>
                 <td>headers</td>
@@ -289,7 +291,6 @@
                 <td>object</td>
                 <td>—</td>
                 <td>—</td>
-                <td></td>
               </tr>
               <tr>
                 <td>param</td>
@@ -297,31 +298,28 @@
                 <td>object</td>
                 <td>—</td>
                 <td>—</td>
-                <td></td>
               </tr>
               <tr>
                 <td>bindElem</td>
-                <td>数据绑定Jquery对象</td>
+                <td>数据绑定Jquery对象。插件会在数据变更时通过$(bindElem).val()方法更新数据。
+                 <br/>单文件时数据格式为“{"url":"***","name":"***"}”（文件对象JSON字符串），多文件时保存为“[{"url":"***","name":"***"},{"url":"***","name":"***"}]”（文件列表JSON字符串）</td>
                 <td>object</td>
                 <td>—</td>
                 <td>—</td>
-                <td></td>
               </tr>
               <tr>
                 <td>data</td>
-                <td>预设文件列表</td>
-                <td>object</td>
+                <td>已上传的文件列表。</td>
+                <td>array</td>
                 <td>—</td>
                 <td>—</td>
-                <td></td>
               </tr>
               <tr>
-                <td>preview</td>
-                <td>是否启动图片预览插件</td>
-                <td>boolean</td>
-                <td>true/false</td>
-                <td>false</td>
-                <td></td>
+                <td>list-type</td>
+                <td>文件列表样式</td>
+                <td>string</td>
+                <td>text（文件列表）、picture（图片列表）、picture-card（图片卡片列表）</td>
+                <td>text</td>
               </tr>
               <tr>
                 <td>subscribeMessage</td>
@@ -331,154 +329,152 @@
                 <td>string</td>
                 <td>log（普通）、info（信息）、warn（警告）、error（错误）</td>
                 <td>info|warn|error</td>
-                <td></td>
               </tr>
               <tr>
                 <td>msg</td>
                 <td>消息模板
-                <br/>详细参数见 <a href="#msg-opts-tab">消息模板参数</a>
-                </td>
+                <br/>详细参数见 <a href="#msg-opts-tab">消息模板参数</a></td>
                 <td>object</td>
                 <td>—</td>
                 <td>—</td>
-                <td></td>
               </tr>
               <tr>
                 <td>controls</td>
                 <td>控制器
-                <br/>详细参数见 <a href="#control-opts-tab">控制器参数</a>
-                </td>
+                <br/>详细参数见 <a href="#control-opts-tab">控制器参数</a></td>
                 <td>object</td>
                 <td>—</td>
                 <td>—</td>
-                <td></td>
+              </tr>
+              <tr>
+                <td>status</td>
+                <td>状态描述内容
+                <br/>详细参数见 <a href="#status-opts-tab">状态描述参数</a></td>
+                <td>object</td>
+                <td>—</td>
+                <td>—</td>
               </tr>
               <tr>
                 <td>before-choose</td>
-                <td>选择文件前的钩子
+                <td>选择文件前的钩子。return false可中断默认行为
+                  <br/>fileList：文件列表
                 </td>
                 <td>function(fileList)</td>
                 <td>—</td>
                 <td>—</td>
-                <td>fileList：文件列表</td>
               </tr>
               <tr>
                 <td>on-choose</td>
-                <td>选择文件的钩子
+                <td>选择文件的钩子。return false可中断默认行为
+                  <br/>elem：input节点
+                  <br/>file：当前选中文件
+                  <br/>fileList：文件列表
                 </td>
                 <td>function(elem, file, fileList)</td>
                 <td>—</td>
                 <td>—</td>
-                <td>elem：input节点
-                  <br/>file：当前选中文件
-                  <br/>fileList：文件列表
-                </td>
               </tr>
               <tr>
                 <td>on-upload</td>
-                <td>上传前的钩子
-                  <br/>可自定义上传实现
+                <td>上传前的钩子。可自定义上传实现。return false可中断默认行为
+                  <br/>index：当前文件的索引
+                  <br/>fileList：文件列表
                 </td>
                 <td>function(index, fileList)</td>
                 <td>—</td>
                 <td>—</td>
-                <td>index：当前文件的索引
-                  <br/>fileList：文件列表
-                </td>
               </tr>
               <tr>
                 <td>on-done</td>
                 <td>上传完毕后的钩子
-                </td>
-                <td>function(status, res, index, fileList)</td>
-                <td>—</td>
-                <td>—</td>
-                <td>status：服务器响应状态码
+                  <br/>status：服务器响应状态码
                   <br/>res：服务端响应信息
                   <br/>index：当前文件的索引
                   <br/>fileList：文件列表
                 </td>
+                <td>function(status, res, index, fileList)</td>
+                <td>—</td>
+                <td>—</td>
               </tr>
               <tr>
                 <td>on-success</td>
-                <td>上传成功后的钩子
+                <td>上传成功后的钩子。return false可中断默认行为
+                  <br/>res：服务端响应信息
+                  <br/>index：当前文件的索引
+                  <br/>fileList：文件列表
                 </td>
                 <td>function(res, index, fileList)</td>
                 <td>—</td>
                 <td>—</td>
-                <td>res：服务端响应信息
-                  <br/>index：当前文件的索引
-                  <br/>fileList：文件列表
-                </td>
               </tr>
               <tr>
                 <td>on-error</td>
-                <td>上传失败后的钩子
-                <td>function(status, res, index, fileList)</td>
-                <td>—</td>
-                <td>—</td>
-                <td>status：服务器响应状态码
+                <td>上传失败后的钩子。return false可中断默认行为
+                  <br/>status：服务器响应状态码
                   <br/>res：服务端响应信息
                   <br/>index：当前文件的索引
                   <br/>fileList：文件列表
                 </td>
+                <td>function(status, res, index, fileList)</td>
+                <td>—</td>
+                <td>—</td>
               </tr>
               <tr>
                 <td>before-remove</td>
-                <td>删除前的钩子
+                <td>删除前的钩子。return false可中断默认行为
+                  <br/>index：当前文件的索引
+                  <br/>fileList：文件列表
+                </td>
                 <td>function(index, fileList)</td>
                 <td>—</td>
                 <td>—</td>
-                <td>index：当前文件的索引
-                  <br/>fileList：文件列表
-                </td>
               </tr>
               <tr>
                 <td>on-remove</td>
                 <td>删除后的钩子
+                  <br/>index：当前文件的索引
+                  <br/>fileList：文件列表
+                </td>
                 <td>function(index, fileList)</td>
                 <td>—</td>
                 <td>—</td>
-                <td>index：当前文件的索引
-                  <br/>fileList：文件列表
-                </td>
               </tr>
               <tr>
                 <td>before-clear</td>
-                <td>清空前的钩子
+                <td>清空前的钩子。return false可中断默认行为
+                  <br/>fileList：文件列表
+                </td>
                 <td>function(fileList)</td>
                 <td>—</td>
                 <td>—</td>
-                <td>fileList：文件列表</td>
               </tr>
               <tr>
                 <td>on-clear</td>
-                <td>清空后的钩子
+                <td>清空后的钩子</td>
                 <td>function()</td>
-                <td>—</td>
                 <td>—</td>
                 <td>—</td>
               </tr>
               <tr>
                 <td>on-change</td>
-                <td>数据变更的钩子
+                <td>数据变更的钩子。当有文件状态标识出现转移时触发。<a href="#const-opts-status">文件状态</a>
+                  <br/>fileList：文件列表
+                </td>
                 <td>function(fileList)</td>
                 <td>—</td>
                 <td>—</td>
-                <td>fileList：文件列表
-                </td>
               </tr>
               <tr>
                 <td>on-msg</td>
-                <td>提示消息的钩子
+                <td>提示消息的钩子。
+                  <br/>level：消息级别（msg、warn、error）
+                  <br/>msg：信息内容
+                  <br/>index：文件索引
+                  <br/>fileList：文件列表
+                </td>
                 <td>function(level, msg, index, fileList)</td>
                 <td>—</td>
                 <td>—</td>
-                <td>level：消息级别（msg、warn、error）
-                  <br/>msg：提示信息
-                  <br/>index：当前文件的索引
-                  <br/>fileList：文件列表
-                </td>
               </tr>
             </tbody>
           </table>
@@ -493,31 +489,76 @@
           <table class="table" cellspacing="0" cellpadding="0" border="0">
             <thead>
               <tr>
-                <th>参数</th>
-                <th>说明</th>
-                <th>类型</th>
-                <th>可选值</th>
-                <th>默认值</th>
+                <th width="20%">参数</th>
+                <th width="40%">说明</th>
+                <th width="20%">类型</th>
+                <th width="20%">默认值</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>limit</td>
-                <td>文件数量超出上限时的提示消息
-                  <br/>可配置变量：{limit}（文件数量上限）
+                <td>文件数量超出上限时的提示消息。可配置变量：{limit}（文件数量上限）
                 </td>
                 <td>string</td>
-                <td>—</td>
                 <td>最多可选择{limit}张图片</td>
               </tr>
               <tr>
                 <td>maxSize</td>
-                <td>文件大小超出上限时的提示消息
-                  <br/>可配置变量：{maxSize}（文件大小上限，单位B）
+                <td>文件大小超出上限时的提示消息。可配置变量：{maxSize}（文件大小上限，单位B）
                 </td>
                 <td>string</td>
-                <td>—</td>
                 <td>文件大小超出</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div class="tab" id="status-opts-tab">
+        <div class="header">
+          <h3>状态描述参数 <button type="button" class="btn-mini collapse"><i class="fa fa-angle-right fa-rotate-90"></i></button></h3>
+        </div>
+        <div class="body">
+          <table class="table" cellspacing="0" cellpadding="0" border="0">
+            <thead>
+              <tr>
+                <th width="20%">参数</th>
+                <th width="40%">说明</th>
+                <th width="20%">类型</th>
+                <th width="20%">默认值</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>0</td>
+                <td>未上传状态描述内容。支持html</td>
+                <td>string</td>
+                <td>未上传</td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>上传中状态描述内容。支持html</td>
+                <td>string</td>
+                <td>上传中</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>已上传状态描述内容。支持html</td>
+                <td>string</td>
+                <td>已上传</td>
+              </tr>
+              <tr>
+                <td>200</td>
+                <td>上传成功状态描述内容。支持html</td>
+                <td>string</td>
+                <td>上传成功</td>
+              </tr>
+              <tr>
+                <td>500</td>
+                <td>上传失败状态描述内容。支持html</td>
+                <td>string</td>
+                <td>上传失败</td>
               </tr>
             </tbody>
           </table>
@@ -532,11 +573,11 @@
           <table class="table" cellspacing="0" cellpadding="0" border="0">
             <thead>
               <tr>
-                <th>参数</th>
-                <th>说明</th>
-                <th>类型</th>
-                <th>可选值</th>
-                <th>默认值</th>
+                <th width="20%">参数</th>
+                <th width="30%">说明</th>
+                <th width="15%">类型</th>
+                <th width="15%">可选值</th>
+                <th width="20%">默认值</th>
               </tr>
             </thead>
             <tbody>
@@ -692,12 +733,12 @@
         </div>
       </div>
       
-      <div class="tab">
+      <div class="tab" id="method-opts-tab">
         <div class="header">
           <h3>方法 <button type="button" class="btn-mini collapse"><i class="fa fa-angle-right fa-rotate-90"></i></button></h3>
         </div>
         <div class="body">
-          <table id="control-opts-table" class="table" cellspacing="0" cellpadding="0" border="0">
+          <table class="table" cellspacing="0" cellpadding="0" border="0">
             <thead>
               <tr>
                 <th width="20%">方法名</th>
@@ -752,18 +793,116 @@
               <tr>
                 <td>insert</td>
                 <td>插入文件
-                <td>fileList[array]：文件列表
-                  <br/>index[number]：插入位置。若index未设置（或index大于等于当前文件列表长度），则效果同push一致
+                <td>index[number]：插入位置。若index未设置（或index大于等于当前文件列表长度），则效果同push一致
+                  <br/>fileList[array]：文件列表
                 </td>
-                <td>$elem.fileUpload('insert', fileList, 2);</td>
+                <td>$elem.fileUpload('insert', index, fileList);</td>
               </tr>
               <tr>
                 <td>update</td>
-                <td>更新文件状态
+                <td>更新文件属性
                 <td>index[number]：文件索引
-                  <br/>option[object]：更新属性
+                  <br/>option[object]：文件属性。url（地址）、status（状态码）、name（文件名称）、originUrl（预览地址）、originData（源文件File）
                 </td>
                 <td>$elem.fileUpload('update', index, option);</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <div class="tab" id="const-opts-tab">
+        <div class="header">
+          <h3>常量 <button type="button" class="btn-mini collapse"><i class="fa fa-angle-right fa-rotate-90"></i></button></h3>
+        </div>
+        <div class="body">
+          <table class="table" cellspacing="0" cellpadding="0" border="0">
+            <thead>
+              <tr>
+                <th width="20%">域</th>
+                <th width="20%">类型</th>
+                <th width="20%">常量值</th>
+                <th width="40%">说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td rowspan="9">事件</td>
+                <td rowspan="9">string</td>
+                <td>choose</td>
+                <td>选择事件</td>
+              </tr>
+              <tr>
+                <td>display-show</td>
+                <td>显示事件</td>
+              </tr>
+              <tr>
+                <td>display-hide</td>
+                <td>隐藏事件</td>
+              </tr>
+              <tr>
+                <td>upload</td>
+                <td>上传事件</td>
+              </tr>
+              <tr>
+                <td>remove</td>
+                <td>删除事件</td>
+              </tr>
+              <tr>
+                <td>clear</td>
+                <td>清空事件</td>
+              </tr>
+              <tr>
+                <td>push</td>
+                <td>添加事件</td>
+              </tr>
+              <tr>
+                <td>insert</td>
+                <td>插入事件</td>
+              </tr>
+              <tr>
+                <td>update</td>
+                <td>更新事件</td>
+              </tr>
+              <tr>
+                <td rowspan="4">消息</td>
+                <td rowspan="4">string</td>
+                <td>log</td>
+                <td>普通级别</td>
+              </tr>
+              <tr>
+                <td>info</td>
+                <td>信息级别</td>
+              </tr>
+              <tr>
+                <td>warn</td>
+                <td>警告级别</td>
+              </tr>
+              <tr>
+                <td>error</td>
+                <td>错误级别</td>
+              </tr>
+              <tr id="const-opts-status">
+                <td rowspan="5">文件状态</td>
+                <td rowspan="5">number</td>
+                <td>0</td>
+                <td>等待上传。该状态下文件标识为“无效”</td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>正在上传。该状态下文件标识为“无效”</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>已上传。该状态下文件标识为“有效”</td>
+              </tr>
+              <tr>
+                <td>200</td>
+                <td>上传成功。该状态下文件标识为“有效”</td>
+              </tr>
+              <tr>
+                <td>500</td>
+                <td>上传失败。该状态下文件标识为“无效”</td>
               </tr>
             </tbody>
           </table>
@@ -784,26 +923,12 @@
       });
     </script>
     <script>
-      // 简单调用
-      $('#file-simple-upload').fileUpload({
-        'auto': false,
-        // 上传前的钩子 return false可中断默认行为
-        'on-upload': function (index, fileList) {
-          console.log('on-upload', index, fileList);
-          $elem.fileUpload('update', index, {status: 200});
-          return false;
-        },
-        'on-msg': function (event, level, msg, index, fileList) {
-          alert(msg);
-        },
-      });
-      
-      // step-1 init
-      const $elem = $('#file-simple-upload');
+      // 配置参数
       const option = {
           'multiple': true,
-          'limit': 6,
+          'limit': 12,
           'maxSize': 1024000,
+          'accept': '.*',
           'acceptMime': 'image/*',
           'exts': 'jpg|png',
           'auto': false,
@@ -813,11 +938,15 @@
             'output': 'json',
           },
           'headers': {},
-          'bindElem': $('#bind-elem'),
-          'data': [
-            {'src': 'http://127.0.0.1:8848/jquery-image-util/img/cat-1701156_1920.jpg'},
-            {'src': 'http://127.0.0.1:8848/jquery-image-util/img/cat-238394_1920.jpg'},
-          ],
+          'bindElem': '#bind-elem',
+          'list-type': 'picture-card',
+          'data': [{
+            'url': './img/cat-1.jpg',
+            'name': 'cat-1',
+          }, {
+            'url': './img/cat-2.jpg',
+            'name': 'cat-2',
+          }],
           'msg': {
             'limit': '最多可选{limit}份文档',
           },
@@ -839,6 +968,13 @@
             'clear-content': '<i class="fa fa-trash"></i>',
             'upload-content': '<i class="fa fa-cloud-upload"></i>',
             'delete-content': '<i class="fa fa-trash"></i>',
+          },
+          'status': {
+            0: '<i class="fa fa-circle"> 未上传</i>',
+            1: '<i class="fa fa-circle"> 上传中</i>',
+            2: '<i class="fa fa-circle"> 已上传</i>',
+            200: '<i class="fa fa-circle"> 上传成功</i>',
+            500: '<i class="fa fa-circle"> 上传失败</i>',
           },
           // 选择文件前的钩子 return false可中断默认行为
           'before-choose': function (fileList) {
@@ -881,27 +1017,59 @@
             console.log('on-msg', event, level, msg, index, fileList);
           },
           preview: true
-        }
-      //$elem.fileUpload(option);
-
-      // api
-      $('#choose').on('click', function() {
+        };
+      
+      // 初始化
+      const $elem = $('#file-upload').fileUpload(option);
+      
+      // 方法调用
+      $('#event-choose').on('click', function() {
+        // 选择文件
         $elem.fileUpload('choose');
       });
-      $('#display-show').on('click', function() {
+      $('#event-display-show').on('click', function() {
+        // 显示文件列表
         $elem.fileUpload('display', true);
       });
-      $('#display-hide').on('click', function() {
+      $('#event-display-hide').on('click', function() {
+        // 隐藏文件列表
         $elem.fileUpload('display', false);
       });
-      $('#upload-multiple').on('click', function() {
+      $('#event-upload').on('click', function() {
+        // 上传文件（第2份）
+        $elem.fileUpload('upload', 1);
+      });
+      $('#event-upload-multiple').on('click', function() {
+        // 批量上传文件
         $elem.fileUpload('uploadMultiple');
       });
-      $('#clear').on('click', function() {
+      $('#event-remove').on('click', function() {
+        // 删除文件（第2份）
+        $elem.fileUpload('remove', 1);
+      });
+      $('#event-clear').on('click', function() {
+        // 清空文件
         $elem.fileUpload('clear');
       });
-      $('#push').on('click', function() {
-        $elem.fileUpload('push', ['http://127.0.0.1:8848/jquery-image-util/img/cat-1701156_1920.jpg', 'http://127.0.0.1:8848/jquery-image-util/img/cat-238394_1920.jpg'])
+      $('#event-push').on('click', function() {
+        // 添加文件列表
+        $elem.fileUpload('push', [
+            {'url': './img/cat-3.jpg', 'status': 0},
+            {'url': './img/cat-4.jpg', 'status': 2},
+          ])
+      });
+      $('#event-insert').on('click', function() {
+        // 插入文件列表（在第2个位置插入文件）
+        $elem.fileUpload('insert', 1, [
+            {'url': './img/cat-5.jpg', 'status': 0},
+            {'url': './img/cat-6.jpg', 'status': 1},
+            {'url': './img/cat-7.jpg', 'status': 200},
+          ])
+      });
+      $('#event-update').on('click', function() {
+        // 更新文件属性
+        // 将第1份文件状态修改为待上传
+        $elem.fileUpload('update', 1, {'status': 0});
       });
     </script>
 	</body>
