@@ -133,7 +133,7 @@
     
     self.fileList = [];
     self.fileKey = 0;
-    self.start();
+    self.init();
     console.log(self)
   }
 
@@ -141,7 +141,7 @@
     /**
      * @description 启动插件
      */
-    start: function() {
+    init: function() {
       const self = this;
       const $elem = self.element;
       
@@ -626,8 +626,15 @@
       }
       return true
     },
+		/**
+		 * @description 输出文件列表
+		 */
+		list: function() {
+			const self = this;
+			return self.fileList || [];
+		},
     /**
-     * @description 输出已上传成功的文件数据 若限制单文件时返回一个文件对象，若多文件时返回一个文件列表。
+     * @description 输出已上传成功的文件数据 若限制单文件时返回一个文件对象，若多文件时返回一个文件列表
      */
     val: function() {
       const self = this;
@@ -810,23 +817,12 @@
           break;
         case 'text': // 文件列表
         default:
-          /* html.push('<div class="upload-file-indicator">');
-          html.push('<p>' + self.getStatusText(file.status) + '</p>');
-          html.push('</div>');
-          html.push('<div class="upload-file-control">');
-          switch (file.status) {
-            case UploadWait:
-            case UploadFailure:
-              html.push('<button type="button" class="ctrl-upload btn ' + self.options.controls['upload-style'] + '">' + self.options.controls['upload-content'] + '</button>');
-            default:
-          }
-          html.push('<button type="button" class="ctrl-remove btn ' + self.options.controls['delete-style'] + '">' + self.options.controls['delete-content'] + '</button>');
-          html.push('</div>'); */
-          
-          //html.push('<i class="file-type-icon fa fa-file-o"></i>');
           html.push('<a class="file-name" href="' + file.url + '"><i class="file-type-icon fa fa-file-text-o"></i>' + file.name + '</a>');
+          html.push('<span class="upload-file-control">');
           html.push('<i class="file-status-icon fa fa-check-circle-o"></i>');
+          html.push('<i class="file-upload-icon fa fa-cloud-upload ctrl-upload"></i>');
           html.push('<i class="file-remove-icon fa fa-remove ctrl-remove"></i>');
+          html.push('</span>');
       }
       
       html.push('</li>');
@@ -923,17 +919,39 @@
   };
 
   $.fn.fileUpload = function(option) {
-    const args = arguments;
-    return this.each(function() {
-      const self = $(this);
-      let data = self.data('fileUpload');
-      if (!data) {
-        data = new FileUpload(self, option);
-        self.data('fileUpload', data)
-      }
-      if (typeof option === 'string') {
-        data[option].apply(data, Array.prototype.slice.call(args, 1));
-      }
-    })
+		const args = arguments;
+		[].shift.apply(args);
+		
+		let value;
+		const chain = this.each(function () {
+		  const $this = $(this);
+		  let data = $this.data('fileUpload');
+		  
+		  if (!data) {
+				// 初始化
+				$this.data('fileUpload', (data = new FileUpload($this, option)));
+		  } else if (typeof option == 'object') {
+		    // 更新参数
+				for (let i in option) {
+		      if (option.hasOwnProperty(i)) {
+		        data.options[i] = option[i];
+		      }
+		    }
+		  } else if (typeof option == 'string') {
+		    // 调用方法/获取参数值
+				if (data[option] instanceof Function) {
+		      value = data[option].apply(data, args);
+		    } else {
+		      value = data.options[option];
+		    }
+		  }
+		});
+		
+		if (typeof value !== 'undefined') {
+		  // noinspection JSUnusedAssignment
+		  return value;
+		} else {
+		  return chain;
+		}
   };
 })($);

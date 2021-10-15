@@ -210,6 +210,7 @@
           <button id="event-push" type="button">追加文件</button>
           <button id="event-insert" type="button">插入文件列表（第1个文件后）</button>
           <button id="event-update" type="button">更新文件属性</button>
+          <button id="event-val" type="button">获取数据</button>
         </div>
       </div>
       
@@ -806,6 +807,30 @@
                 </td>
                 <td>$elem.fileUpload('update', index, option);</td>
               </tr>
+              <tr>
+                <td>list</td>
+                <td>获取文件列表</td>
+                <td>—</td>
+                <td>$elem.fileUpload('list', index);</td>
+              </tr>
+              <tr>
+                <td>val</td>
+                <td>获取已上传文件数据。返回值为文件列表（或文件对象）</td>
+                <td>—</td>
+                <td>$elem.fileUpload('val');</td>
+              </tr>
+              <tr>
+                <td>toJsonString</td>
+                <td>获取已上传文件数据。返回值为文件列表（或文件对象）的JSON序列</td>
+                <td>—</td>
+                <td>$elem.fileUpload('toJsonString');</td>
+              </tr>
+              <tr>
+                <td>findElem</td>
+                <td>查找文件节点</td>
+                <td>index[number]：文件索引</td>
+                <td>$elem.fileUpload('findElem', index);</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -939,13 +964,13 @@
           },
           'headers': {},
           'bindElem': '#bind-elem',
-          'list-type': 'picture-card',
+          'list-type': 'text',
           'data': [{
             'url': './img/cat-1.jpg',
-            'name': 'cat-1',
+            'name': 'cat-1.jpg',
           }, {
             'url': './img/cat-2.jpg',
-            'name': 'cat-2',
+            'name': 'cat-2.jpg',
           }],
           'msg': {
             'limit': '最多可选{limit}份文档',
@@ -1054,22 +1079,32 @@
       $('#event-push').on('click', function() {
         // 添加文件列表
         $elem.fileUpload('push', [
-            {'url': './img/cat-3.jpg', 'status': 0},
-            {'url': './img/cat-4.jpg', 'status': 2},
+            {'url': './img/cat-3.jpg', 'status': 0, 'name': 'cat-3.jpg'},
+            {'url': './img/cat-4.jpg', 'status': 2, 'name': 'cat-4.jpg'},
           ])
       });
       $('#event-insert').on('click', function() {
         // 插入文件列表（在第2个位置插入文件）
         $elem.fileUpload('insert', 1, [
-            {'url': './img/cat-5.jpg', 'status': 0},
-            {'url': './img/cat-6.jpg', 'status': 1},
-            {'url': './img/cat-7.jpg', 'status': 200},
+            {'url': './img/cat-5.jpg', 'status': 0, 'name': 'cat-5.jpg'},
+            {'url': './img/cat-6.jpg', 'status': 1, 'name': 'cat-6.jpg'},
+            {'url': './img/cat-7.jpg', 'status': 200, 'name': 'cat-7.jpg'},
           ])
       });
       $('#event-update').on('click', function() {
         // 更新文件属性
         // 将第1份文件状态修改为待上传
         $elem.fileUpload('update', 1, {'status': 0});
+      });
+      $('#event-val').on('click', function() {
+        // 获取数据
+        const val = $elem.fileUpload('list');
+				
+				console.log($elem);
+				console.log('event-val', val);
+				for (let i = 0; i < val.length; i++) {
+					console.log('node', $elem.fileUpload('findElem', i));
+				}
       });
     </script>
 	</body>

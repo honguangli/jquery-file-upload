@@ -368,6 +368,19 @@
   text-align: center;
 }
 
+.upload-files-box .upload-file-list.text .upload-file-control {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  right: 5px;
+}
+
+.upload-files-box .upload-file-list.picture-card .upload-file-control {
+  margin: 2px;
+  border-top: 1px solid #eee;
+  text-align: right;
+}
+
 .upload-files-box .upload-file-item .file-type-icon {
   display: inline-block;
   margin-right: 5px;
@@ -378,20 +391,23 @@
 
 .upload-files-box .upload-file-item .file-status-icon {
   display: inline-block;
-  position: absolute;
-  top: 0;
-  right: 5px;
   padding: 0 5px;
   opacity: .75;
   color: #00a65a;
   line-height: 2;
 }
 
+.upload-files-box .upload-file-item .file-upload-icon {
+  display: none;
+  padding: 0 5px;
+  cursor: pointer;
+  opacity: .75;
+  color: #606266;
+  line-height: 2;
+}
+
 .upload-files-box .upload-file-item .file-remove-icon {
   display: none;
-  position: absolute;
-  top: 0;
-  right: 5px;
   padding: 0 5px;
   cursor: pointer;
   opacity: .75;
@@ -461,10 +477,4 @@
 .upload-files-box .upload-file-item>.upload-file-indicator>p {
   margin: 0;
   padding: 0;
-}
-
-.upload-files-box .upload-file-item>.upload-file-control {
-  margin: 2px;
-  border-top: 1px solid #eee;
-  text-align: right;
 }
