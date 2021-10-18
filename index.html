@@ -82,10 +82,27 @@
         border-color: #3a8ee6;
         outline: none;
       }
-      code {
-        font-size: 16px;
-        font-weight: 400;
-        color: #666;
+      a.link {
+        cursor: pointer;
+        color: #409eff;
+        text-decoration: none;
+      }
+      a.link:hover {
+        position: relative;
+        color: #66b1ff;
+      }
+      a.link:hover:after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 0;
+        bottom: 0;
+        border-bottom: 1px solid #409eff;
+      }
+      pre, code {
+        margin: 0;
+        padding: 0;
       }
       .content {
         max-width: 1200px;
@@ -100,22 +117,16 @@
       .tab {
         margin-bottom: 50px;
       }
-      /* .tab .body.border > :not(.meta) {
-        padding: 15px;
-      } */
       .tab .header .fa-angle-right {
         transition-duration: .2s;
-      }
-      .tab .divider {
-        border-top: 1px solid #ebebeb;
-      }
-      .tab .code {
-        background-color: #fafafa;
       }
       .tab .body.border {
         border: 1px solid #ebebeb;
         border-radius: 3px;
 				padding: 15px;
+      }
+      .tab .divider {
+        border-top: 1px solid #ebebeb;
       }
 			.tab .body.border .divider {
 				margin: 15px -15px 0;
@@ -124,6 +135,12 @@
 				margin: 0 -15px -15px;
 				padding: 15px;
 			}
+      .tab .code {
+        font-size: 16px;
+        font-weight: 400;
+        color: #888;
+        background-color: #fafafa;
+      }
       .table {
         table-layout:fixed;
         width: 100%;
@@ -158,7 +175,8 @@
       #file-picture-upload {
 			  max-width: 360px;
 			}
-			#file-picture-card-upload {
+			#file-picture-card-upload,
+      #file-picture-placeholder-upload {
 			  max-width: 100%;
 			}
     </style>
@@ -166,7 +184,7 @@
 	<body>
     <div class="content">
       <h1 class="title">文件上传插件说明文档</h1>
-			
+    
 			<div class="tab">
 			  <div class="header">
 			    <h3>前言</h3>
@@ -174,7 +192,7 @@
 			  <div class="body border">
 			    <ul>
 			    	<li>依赖：jquery（必须）、font-awesome（可通过配置重置）</li>
-			    	<li>默认图标为fontawesome，若导入项目使用其他图标库，可通过本插件提供的配置参数修改图标。详见<a href="#control-opts-tab">控制器参数</a>、<a href="#status-opts-tab">状态图标参数</a></li>
+			    	<li>默认图标为font-awesome，若想使用其他图标库，可通过本插件提供的配置参数修改图标内容。详见<a class="link" href="#status-opts-tab">状态图标</a>、<a class="link" href="#control-opts-tab">控制器图标</a></li>
 			    </ul>
 			  </div>
 			</div>
@@ -187,9 +205,7 @@
           <div id="file-upload"></div>
           <div class="divider"></div>
           <div class="code">
-            <code>
-              $(elem).fileUpload(option);
-            </code>
+            <pre>$(elem).fileUpload(option);</pre>
           </div>
         </div>
       </div>
@@ -202,9 +218,12 @@
 			    <div id="file-multiple-upload"></div>
 			    <div class="divider"></div>
 			    <div class="code">
-			      <code>
-			        $(elem).fileUpload(option);
-			      </code>
+            <pre>
+// 多文件
+$(elem).fileUpload({
+  'multiple': true, // 允许多文件上传
+  'limit': 3,       // 限制最多上传3份文件
+});</pre>
 			    </div>
 			  </div>
 			</div>
@@ -217,9 +236,14 @@
 			    <div id="file-control-upload"></div>
 			    <div class="divider"></div>
 			    <div class="code">
-			      <code>
-			        $(elem).fileUpload(option);
-			      </code>
+			      <pre>
+$(elem).fileUpload({
+  'controls': {              // 控制器
+    'display': true,         // 启用显示/隐藏按钮
+    'upload-multiple': true, // 启用批量上传按钮
+    'clear': true,           // 启用清空按钮
+  }
+});</pre>
 			    </div>
 			  </div>
 			</div>
@@ -232,13 +256,14 @@
 					<div id="file-bind-upload"></div>
 					<div class="divider"></div>
 					<div class="code">
-					  <code>
-					    $(elem).fileUpload(option);
-					  </code>
+			      <pre>
+$(elem).fileUpload({
+  'bindElem': '#bind-elem', // 数据绑定节点
+});</pre>
 					</div>
 					<div class="divider"></div>
           <div>
-						<input id="bind-elem" readonly="readonly" placeholder="已上传文件数据（JSON）"/>
+						<input id="bind-elem" readonly="readonly" placeholder="已上传文件数据"/>
 					</div>
         </div>
       </div>
@@ -251,9 +276,10 @@
 			    <div id="file-picture-upload"></div>
 			    <div class="divider"></div>
 			    <div class="code">
-			      <code>
-			        $(elem).fileUpload(option);
-			      </code>
+			      <pre>
+$(elem).fileUpload({
+  'list-type': 'picture', // 图片列表
+});</pre>
 			    </div>
 			  </div>
 			</div>
@@ -266,12 +292,29 @@
 			    <div id="file-picture-card-upload"></div>
 			    <div class="divider"></div>
 			    <div class="code">
-			      <code>
-			        $(elem).fileUpload(option);
-			      </code>
+			      <pre>
+$(elem).fileUpload({
+  'list-type': 'picture-card', // 图片卡片列表
+});</pre>
 			    </div>
 			  </div>
 			</div>
+      
+      <div class="tab">
+        <div class="header">
+          <h3>图片-卡片占位列表</h3>
+        </div>
+        <div class="body border">
+          <div id="file-picture-placeholder-upload"></div>
+          <div class="divider"></div>
+          <div class="code">
+			      <pre>
+$(elem).fileUpload({
+  'list-type': 'picture-placeholder', // 图片占位卡片列表
+});</pre>
+          </div>
+        </div>
+      </div>
 			
 			<div class="tab">
 			  <div class="header">
@@ -281,9 +324,7 @@
 			    <div id="file-method-upload"></div>
 			    <div class="divider"></div>
 			    <div class="code">
-			      <code>
-			        $(elem).fileUpload(option);
-			      </code>
+			      <pre>$elem.fileUpload(方法名[, 参数]...);</pre>
 			    </div>
 			    <div class="divider"></div>
 			    <div>
@@ -419,7 +460,7 @@
                 <td>list-type</td>
                 <td>文件列表样式</td>
                 <td>string</td>
-                <td>text（文件列表）、picture（图片列表）、picture-card（图片卡片列表）</td>
+                <td>text（文件列表）、picture（图片列表）、picture-card（图片卡片列表）、picture-placeholder（图片卡片占位）</td>
                 <td>text</td>
               </tr>
               <tr>
@@ -434,7 +475,7 @@
               <tr>
                 <td>msg</td>
                 <td>消息模板
-                <br/>详细参数见 <a href="#msg-opts-tab">消息模板参数</a></td>
+                <br/>详细参数见<a class="link" href="#msg-opts-tab">消息模板参数</a></td>
                 <td>object</td>
                 <td>—</td>
                 <td>—</td>
@@ -442,22 +483,22 @@
               <tr>
                 <td>controls</td>
                 <td>控制器
-                <br/>详细参数见 <a href="#control-opts-tab">控制器参数</a></td>
+                <br/>详细参数见<a class="link" href="#control-opts-tab">控制器参数</a></td>
                 <td>object</td>
                 <td>—</td>
                 <td>—</td>
               </tr>
               <tr>
-                <td>status</td>
+                <td>status-icon</td>
                 <td>状态图标
-                <br/>详细参数见 <a href="#status-opts-tab">状态图标参数</a></td>
+                <br/>详细参数见<a class="link" href="#status-opts-tab">状态图标参数</a></td>
                 <td>object</td>
                 <td>—</td>
                 <td>—</td>
               </tr>
               <tr>
                 <td>before-choose</td>
-                <td>选择文件前的钩子。return false可中断默认行为
+                <td>选择文件前的钩子。return false可拒绝选择文件
                   <br/>fileList：文件列表
                 </td>
                 <td>function(fileList)</td>
@@ -466,7 +507,7 @@
               </tr>
               <tr>
                 <td>on-choose</td>
-                <td>选择文件的钩子。return false可中断默认行为
+                <td>选择文件的钩子。return false可拒绝选择文件
                   <br/>elem：input节点
                   <br/>file：当前选中文件
                   <br/>fileList：文件列表
@@ -477,7 +518,7 @@
               </tr>
               <tr>
                 <td>on-upload</td>
-                <td>上传前的钩子。可自定义上传实现。return false可停止默认上传行为
+                <td>上传前的钩子。可自定义上传实现。return false可拒绝默认上传动作
                   <br/>file：当前文件
                   <br/>fileList：文件列表
                 </td>
@@ -499,10 +540,10 @@
               </tr>
               <tr>
                 <td>on-success</td>
-                <td>上传成功后的钩子。return false可中断默认行为
+                <td>上传成功后的钩子。return false可拒绝默认更新文件属性动作
                   <br/>res：服务端响应信息
                   <br/>file：当前文件
-                  <br/>fileList：文件列表
+                  <br/>fileList：文件列表 
                 </td>
                 <td>function(res, file, fileList)</td>
                 <td>—</td>
@@ -510,7 +551,7 @@
               </tr>
               <tr>
                 <td>on-error</td>
-                <td>上传失败后的钩子。return false可中断默认行为
+                <td>上传失败后的钩子。return false可拒绝默认更新文件属性动作
                   <br/>status：服务器响应状态码
                   <br/>res：服务端响应信息
                   <br/>file：当前文件
@@ -522,7 +563,7 @@
               </tr>
               <tr>
                 <td>on-remove</td>
-                <td>删除前的钩子。return false可中断默认行为
+                <td>删除前的钩子。return false可拒绝删除动作
                   <br/>file：当前文件
                   <br/>fileList：文件列表
                 </td>
@@ -532,7 +573,7 @@
               </tr>
               <tr>
                 <td>on-clear</td>
-                <td>清空前的钩子。return false可中断默认行为
+                <td>清空前的钩子。return false可拒绝删除动作
                   <br/>fileList：文件列表
                 </td>
                 <td>function(fileList)</td>
@@ -541,7 +582,7 @@
               </tr>
               <tr>
                 <td>on-change</td>
-                <td>数据变更的钩子。当有文件状态标识出现转移时触发。<a href="#const-opts-status">文件状态</a>
+                <td>数据变更的钩子。当有文件状态标识出现转移时触发。详见<a class="link" href="#const-opts-status">文件状态标识</a>
                   <br/>fileList：文件列表
                 </td>
                 <td>function(fileList)</td>
@@ -551,13 +592,12 @@
               <tr>
                 <td>on-msg</td>
                 <td>提示消息的钩子。
-									<br/>event：事件
-                  <br/>level：消息级别（msg、warn、error）
+									<br/>event：事件。详见<a class="link" href="#const-opts-event">事件定义</a>
+                  <br/>level：消息级别。详见<a class="link" href="#const-opts-msg">消息定义</a>
                   <br/>msg：信息内容
-                  <br/>key：文件关键字
                   <br/>fileList：文件列表
                 </td>
-                <td>function(level, msg, file, fileList)</td>
+                <td>function(event, level, msg, fileList)</td>
                 <td>—</td>
                 <td>—</td>
               </tr>
@@ -848,6 +888,13 @@
                 <td>—</td>
                 <td>&lt;i class="fa fa-plus fa-fw"&gt;&lt;/i&gt;</td>
               </tr>
+              <tr>
+                <td>picture-choose-content-list</td>
+                <td>图片选择卡片占位内容。根据下标渲染对应占位卡片内容，一般配合list-type="picture-placeholder"使用，默认内容为picture-choose-content参数值</td>
+                <td>array[string]</td>
+                <td>—</td>
+                <td>—</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -985,7 +1032,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr id="const-opts-event">
                 <td rowspan="9">事件</td>
                 <td rowspan="9">string</td>
                 <td>choose</td>
@@ -1023,7 +1070,7 @@
                 <td>update</td>
                 <td>更新事件</td>
               </tr>
-              <tr>
+              <tr id="const-opts-msg">
                 <td rowspan="4">消息</td>
                 <td rowspan="4">string</td>
                 <td>log</td>
@@ -1083,7 +1130,26 @@
     </script>
 		<script>
 		  // 基本用法
-			$('#file-upload').fileUpload({});
+			$('#file-upload').fileUpload({
+        'on-upload': function(file, fileList) { // 文件上传前的钩子
+        	// 更新为上传中
+        	$('#file-upload').fileUpload('update', file.key, {'status': 1});
+        	
+        	// 自定义上传实现
+        	upload(file, function(res){
+        	  if (res.code === 200) {
+        	  	// 上传成功后更新文件属性
+        	  	$('#file-upload').fileUpload('update', file.key, {'status': 200, 'url': res.url});
+        	  } else {
+        	  	// 上传失败后更新文件属性
+        	  	$('#file-upload').fileUpload('update', file.key, {'status': 500});
+        	  }
+        	})
+        	
+        	// return false 停止后续默认上传行为
+        	return false
+        },
+      });
 			
 			// 多文件
 			$('#file-multiple-upload').fileUpload({
@@ -1106,20 +1172,19 @@
 				'limit': 3,                             // 限制最多上传3份文件
 				'bindElem': '#bind-elem',               // 数据绑定节点
 				'on-upload': function(file, fileList) { // 文件上传前的钩子
-					// 自定义上传实现
-					// 这里模拟上传，30%概率上传失败
 					// 更新为上传中
 					$('#file-bind-upload').fileUpload('update', file.key, {'status': 1});
-					setTimeout(function() {
-						const res = Math.floor(Math.random()*10);
-						if (res < 3) {
-							// 上传失败后更新文件属性
-							$('#file-bind-upload').fileUpload('update', file.key, {'status': 500});
-						} else {
-							// 上传成功后更新文件属性
-							$('#file-bind-upload').fileUpload('update', file.key, {'status': 200, 'url': './img/cat-1.jpg'});
-						}
-					}, 2000);
+					
+					// 自定义上传实现
+					upload(file, function(res){
+					  if (res.code === 200) {
+					  	// 上传成功后更新文件属性
+					  	$('#file-bind-upload').fileUpload('update', file.key, {'status': 200, 'url': res.url});
+					  } else {
+					  	// 上传失败后更新文件属性
+					  	$('#file-bind-upload').fileUpload('update', file.key, {'status': 500});
+					  }
+					})
 					
 					// return false 停止后续默认上传行为
 					return false
@@ -1140,13 +1205,64 @@
 				'limit': 3,                                     // 限制最多上传3份文件
 				'list-type': 'picture-card',                    // 图片列表样式
 				'data': ['./img/cat-1.jpg', './img/cat-2.jpg'], // 已上传文件列表
+        'on-upload': function(file, fileList) {         // 文件上传前的钩子
+        	// 更新为上传中
+        	$('#file-picture-card-upload').fileUpload('update', file.key, {'status': 1});
+          
+        	// 自定义上传实现
+          upload(file, function(res){
+            if (res.code === 200) {
+            	// 上传成功后更新文件属性
+            	$('#file-picture-card-upload').fileUpload('update', file.key, {'status': 200, 'url': res.url});
+            } else {
+            	// 上传失败后更新文件属性
+            	$('#file-picture-card-upload').fileUpload('update', file.key, {'status': 500});
+            }
+          })
+        
+        	// return false 停止后续默认上传行为
+        	return false
+        },
+        'auto': false,
 			});
+      
+      // 图片卡片占位列表
+      $('#file-picture-placeholder-upload').fileUpload({
+      	'multiple': true,                               // 允许多文件上传
+      	'limit': 2,                                     // 限制最多上传3份文件
+      	'list-type': 'picture-placeholder',             // 图片占位列表样式
+        'auto': false,                                  // 关闭自动上传
+        'controls': {                                   // 控制器
+          'picture-choose-content-list': [              // 占位卡片内容
+            '<img src="./img/card.PNG" style="width: 100%; height: 100%; object-fit: cover;"/>',
+            '<img src="./img/card-reverse.PNG" style="width: 100%; height: 100%; object-fit: cover;"/>'
+          ],
+        },
+        'on-upload': function(file, fileList) {         // 文件上传前的钩子
+        	// 更新为上传中
+        	$('#file-picture-placeholder-upload').fileUpload('update', file.key, {'status': 1});
+          
+        	// 自定义上传实现
+          upload(file, function(res){
+            if (res.code === 200) {
+            	// 上传成功后更新文件属性
+            	$('#file-picture-placeholder-upload').fileUpload('update', file.key, {'status': 200, 'url': res.url});
+            } else {
+            	// 上传失败后更新文件属性
+            	$('#file-picture-placeholder-upload').fileUpload('update', file.key, {'status': 500});
+            }
+          })
+        
+        	// return false 停止后续默认上传行为
+        	return false
+        },
+      });
 			
 			// 方法调用
 			const $elem = $('#file-method-upload').fileUpload({
 				'multiple': true,                               // 允许多文件上传
 				'limit': 16,                                    // 限制最多上传3份文件
-				'bindElem': '#bind-elem',                       // 数据绑定节点
+        'auto': false,                                  // 关闭自动上传
 				'data': ['./img/cat-1.jpg', './img/cat-2.jpg'], // 已上传文件列表
 				'controls': {                                   // 控制器
 					'display': true,                              // 启用显示/隐藏按钮
@@ -1154,19 +1270,20 @@
 					'clear': true,                                // 启用清空按钮
 				},
 				'on-upload': function(file, fileList) {         // 文件上传前的钩子
+					// 更新为上传中
+					$elem.fileUpload('update', file.key, {'status': 1});
+          
 					// 自定义上传实现
-					// 这里模拟上传，30%概率上传失败
-					setTimeout(function() {
-						const res = Math.floor(Math.random()*10);
-						if (res < 3) {
-							// 上传失败后更新文件属性
-							$('#file-bind-upload').fileUpload('update', file.key, {'status': 500});
-						} else {
-							// 上传成功后更新文件属性
-							$('#file-bind-upload').fileUpload('update', file.key, {'status': 200, 'url': './img/cat-1.jpg'});
-						}
-					}, 2000);
-					
+          upload(file, function(res){
+            if (res.code === 200) {
+            	// 上传成功后更新文件属性
+            	$elem.fileUpload('update', file.key, {'status': 200, 'url': res.url});
+            } else {
+            	// 上传失败后更新文件属性
+            	$elem.fileUpload('update', file.key, {'status': 500});
+            }
+          })
+
 					// return false 停止后续默认上传行为
 					return false
 				}
@@ -1209,8 +1326,8 @@
 			$('#event-insert').on('click', function() {
 			  // 插入文件列表（在第2个位置插入文件）
 			  $elem.fileUpload('insert', 1, [
-			      {'url': './img/cat-3.jpg', 'status': 0, 'name': 'cat-5.jpg'},
-			      {'url': './img/cat-4.jpg', 'status': 1, 'name': 'cat-6.jpg'},
+			      {'url': './img/cat-5.jpg', 'status': 0, 'name': 'cat-5.jpg'},
+			      {'url': './img/cat-6.jpg', 'status': 1, 'name': 'cat-6.jpg'},
 			      {'url': './img/cat-7.jpg', 'status': 500, 'name': 'cat-7.jpg'},
 			    ])
 			});
@@ -1237,106 +1354,35 @@
 				console.log('event-json', jsonString);
 				alert(jsonString);
 			});
-		</script>
-    <script>
-      // 配置参数
-      const option = {
-          'multiple': true,
-          'limit': 12,
-          'maxSize': 1024000,
-          'accept': '.*',
-          'acceptMime': 'image/*',
-          'exts': 'jpg|png',
-          'auto': false,
-          'url': 'http://local.dl.ermb123.com/group1/upload',
-          'param': {
-            'scene': 'public',
-            'output': 'json',
-          },
-          'headers': {},
-          'bindElem': '#bind-elem',
-          'list-type': 'text',
-          'data': [{
-            'url': './img/cat-1.jpg',
-            'name': 'cat-1.jpg',
-          }, {
-            'url': './img/cat-2.jpg',
-            'name': 'cat-2.jpg',
-          }],
-          'msg': {
-            'limit': '最多可选{limit}份文档',
-          },
-          'controls': {
-            'hide': false,
-            'style': '',
-            'choose': true,
-            'choose-style': '',
-            'choose-content': '<i class="fa fa-cloud-upload"></i> 选择文件',
-            'display': true,
-            'display-style': '',
-            'display-hide-content': '<i class="fa fa-eye-slash"></i>',
-            'display-show-content': '<i class="fa fa-eye"></i>',
-            'upload-multi': true,
-            'upload-multi-style': '',
-            'upload-multi-content': '<i class="fa fa-cloud-upload"></i>',
-            'clear': true,
-            'clear-style': '',
-            'clear-content': '<i class="fa fa-trash"></i>',
-            'upload-content': '<i class="fa fa-cloud-upload"></i>',
-            'delete-content': '<i class="fa fa-trash"></i>',
-          },
-          'status': {
-            0: '<i class="fa fa-circle"> 未上传</i>',
-            1: '<i class="fa fa-circle"> 上传中</i>',
-            2: '<i class="fa fa-circle"> 已上传</i>',
-            200: '<i class="fa fa-circle"> 上传成功</i>',
-            500: '<i class="fa fa-circle"> 上传失败</i>',
-          },
-          // 选择文件前的钩子 return false可中断默认行为
-          'before-choose': function (fileList) {
-            console.log('before-choose', fileList);
-          },
-          // 选择文件的钩子 return false可中断默认行为
-          'on-choose': function (elem, file, fileList) {
-            console.log('on-choose', elem, file, fileList);
-          },
-          // 上传前的钩子 return false可中断默认行为
-          'on-upload': function (index, fileList) {
-            console.log('on-upload', index, fileList);
-          },
-          // 上传完毕后的钩子
-          'on-done': function (status, res, index, fileList) {
-            console.log('on-done', status, res, index, fileList);
-          },
-          // 上传成功后的钩子
-          'on-success': function (res, index, fileList) {
-            console.log('on-success', res, index, fileList);
-          },
-          // 上传失败后的钩子
-          'on-error': function (status, res, index, fileList) {
-            console.log('on-error', status, res, index, fileList);
-          },
-          // 删除前的钩子
-          'before-remove': function (index, fileList) {
-            console.log('before-remove', index, fileList);
-          },
-          // 删除后的钩子
-          'on-remove': function (index, fileList) {
-            console.log('on-remove', index, fileList);
-          },
-          // 数据变更的钩子
-          'on-change': function (fileList) {
-            console.log('on-change', fileList);
-          },
-          // 提示消息的钩子
-          'on-msg': function (event, level, msg, index, fileList) {
-            console.log('on-msg', event, level, msg, index, fileList);
-          },
-          preview: true
-        };
       
-      // 初始化
-      //const $elem = $('#file-upload').fileUpload(option);
-    </script>
+      /**
+       * @param {object} file 文件
+       * @param {function} callback 回调方法
+       * @description 模拟自定义上传实现
+       */
+      function upload(file, callback) {
+        if (!file || typeof file !== 'object') {
+          alert('上传失败：文件不能为空');
+          return
+        }
+        if (!callback || typeof callback !== 'function') {
+          alert('上传失败：未注册上传回调');
+          return
+        }
+				// 这里模拟上传，30%概率上传失败
+        console.log('my upload::file=>', file);
+        setTimeout(function() {
+          let res = {};
+        	if (Math.floor(Math.random()*10) < 3) {
+            res = {'code': 500, 'msg': '上传失败', 'url': ''}
+        	} else {
+            res = {'code': 200, 'msg': '上传成功', 'url': './img/cat-4.jpg'}
+        	}
+          console.log('my upload::res=>', res);
+          callback(res);
+        }, 2000);
+        return
+      }
+		</script>
 	</body>
 </html>

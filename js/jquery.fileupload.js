@@ -56,7 +56,7 @@
     'bindElem': null, // 数据绑定Jquery对象
     'data': [],       // 预设文件列表，['http://a.com/a.jpg', 'http://b.cn/b.png']
     
-    'list-type': 'text', // 文件列表样式 text（文件列表）、picture（图片列表）、picture-card（图片卡片列表）
+    'list-type': 'text', // 文件列表样式 text（文件列表）、picture（图片列表）、picture-card（图片卡片列表）、picture-placeholder（图片卡片占位）
     'preview': false,    // 是否启动图片预览
     
     'subscribeMessage': 'info|warn|error', // 订阅消息
@@ -67,8 +67,8 @@
       'maxSize': '文件大小超出',          // 文件大小超出上限时的提示消息
     },
     
-    // 状态描述文本
-    'status': {
+    // 状态图标
+    'status-icon': {
 			'default-icon': '<i class="fa fa-exclamation-circle fa-fw"></i>', // 未上传图标
 			'uploading-icon': '<i class="fa fa-spinner fa-fw fa-pulse"></i>', // 上传中图标
 			'finish-icon': '<i class="fa fa-check-circle-o fa-fw"></i>',      // 已上传图标
@@ -104,6 +104,7 @@
 			'picture-choose': false,                                               // 图片选择卡片
 			'picture-choose-style': '',                                            // 图片选择卡片样式
 			'picture-choose-content': '<i class="fa fa-plus fa-fw"></i>',          // 图片选择卡片内容
+      'picture-choose-content-list': [],                                     // 图片选择卡片内容列表 图片卡片占位列表时应用本字段
     },
     
     // 钩子函数
@@ -119,10 +120,15 @@
     'on-msg': null,        // 提示消息的钩子
   };
 	
-	// 卡片图片默认配置
+	// 图片卡片默认配置
 	const pictureCardOption = {
 		'controls': {'choose': false, 'picture-choose': true}
 	}
+  
+  // 图片卡片占位默认配置
+  const picturePlaceholderOption = {
+    'controls': {'choose': false}
+  }
 
   /**
    * @param {object} element 加载节点
@@ -132,78 +138,24 @@
   function FileUpload(element, option) {
     const self = this;
     self.element = element;
-		const special = option['list-type'] === 'picture-card' ? pictureCardOption : {};
-    self.options = $.extend(true, {}, defaults, special, option);
-    if (!self.options['multiple']) {
-      self.options['limit'] = 1
-    }
-    self.options['msg']['limit'] = self.options['msg']['limit'].replace(new RegExp('{limit}'), self.options['limit'])
-    self.options['msg']['maxSize'] = self.options['msg']['maxSize'].replace(new RegExp('{maxSize}'), self.options['maxSize'])
-    
-    self.fileList = [];
-    self.fileKey = 1;
-    self.init();
+    self.init(option);
   }
 
   FileUpload.prototype = {
     /**
+     * @param {object} option 参数
      * @description 启动插件
      */
-    init: function() {
+    init: function(option) {
       const self = this;
-      const $elem = self.element;
       
-      $elem.addClass('file-upload-wrap');
-      
-      // 控制器
-			const controls = [];
-      if (self.options.controls['hide'] === false) {
-        // 选择文件按钮
-        if (self.options.controls['choose'] === true) {
-          controls.push('<button type="button" class="ctrl-choose btn ' + self.options.controls['choose-style'] + '">' + self.options.controls['choose-content'] + '</button>');
-        }
-        // 显示隐藏按钮
-        if (self.options.controls['display'] === true) {
-          controls.push('<button type="button" class="ctrl-display btn ' + self.options.controls['display-style'] + '" data-display="true">' + self.options.controls['display-hide-content'] + '</button>');
-        }
-        // 批量上传按钮
-        if (self.options.controls['upload-multiple'] === true) {
-          controls.push('<button type="button" class="ctrl-multiple-upload btn ' + self.options.controls['upload-multiple-style'] + '">' + self.options.controls['upload-multiple-content'] + '</button>');
-        }
-        // 清空按钮
-        if (self.options.controls['clear'] === true) {
-          controls.push('<button type="button" class="ctrl-clear btn ' + self.options.controls['clear-style'] + '">' + self.options.controls['clear-content'] + '</button>');
-        }
-      }
-			
-      const html = [];
-      html.push('<input class="file-input" type="file" accept="' + self.options.acceptMime + '"/>')
-			if (controls.length > 0) {
-				html.push('<div class="controls">');
-				html.push(controls.join('\n'));
-				html.push('</div>');
-			}
-      html.push('<ul class="file-list ' + self.options['list-type'] + '"></ul>');
-			
-			if (self.options['list-type'] === 'picture-card' && self.options.controls['picture-choose'] === true) {
-				html.push('<div class="picture-choose">');
-				html.push('<span class="picture-choose-control ctrl-choose ' + self.options.controls['picture-choose-style'] + '">' + self.options.controls['picture-choose-content'] + '</span>');
-				html.push('</div>');
-			}
-			
-			// TODO 1 图片选择卡片显示时机
-			// TODO 2 图片预览
-			// TODO 3 拖拽上传
-			// TODO 4 msg方法重新定义
-			/*
-			if (!self.canAppend(1)) {
-				self.element.children('.picture-choose').addClass('hide');
-			} else {
-				self.element.children('.picture-choose').removeClass('hide');
-			}
-			*/
-			
-      $elem.append(html.join('\n'));
+      // 初始化参数
+      self.setOption(option);
+      self.fileList = [];
+      self.fileKey = 1;
+
+      // 渲染插件
+      self.render();
       
       // 注册事件监听
       self.when();
@@ -230,6 +182,109 @@
       }
     },
     /**
+     * @param {object} option 参数
+     * @description 设置插件参数
+     */
+    setOption: function(option) {
+      const self = this;
+      // 特殊样式
+      let special = {};
+      switch(option['list-type']) {
+        case 'picture-card': // 图片卡片
+          special = pictureCardOption;
+          break;
+        case 'picture-placeholder': // 图片卡片占位
+          special = picturePlaceholderOption;
+          break;
+        default:
+      }
+      
+      // 合并配置参数
+      const config = $.extend(true, {}, defaults, special, option);
+      
+      // 参数修正
+      if (typeof config.multiple !== 'boolean') {
+        config.multiple = false;
+      }
+      if (!config.multiple) {
+        config.limit = 1;
+      }
+      if(config['list-type'] === 'picture-placeholder') {
+        config.limit = config.limit > 0 ? config.limit : 1;
+      }
+      
+      config.msg['limit'] = config.msg['limit'].replace(new RegExp('{limit}'), config['limit'])
+      config.msg['maxSize'] = config.msg['maxSize'].replace(new RegExp('{maxSize}'), config['maxSize'])
+      
+      self.options = config;
+      return true;
+    },
+    /**
+     * @description 渲染插件
+     */
+    render: function() {
+      const self = this;
+      
+      // 控制器
+      const controls = [];
+      if (self.options.controls['hide'] === false) {
+        // 选择文件按钮
+        if (self.options.controls['choose'] === true) {
+          controls.push('<button type="button" class="ctrl-choose btn ' + self.options.controls['choose-style'] + '">' + self.options.controls['choose-content'] + '</button>');
+        }
+        // 显示隐藏按钮
+        if (self.options.controls['display'] === true) {
+          controls.push('<button type="button" class="ctrl-display btn ' + self.options.controls['display-style'] + '" data-display="true">' + self.options.controls['display-hide-content'] + '</button>');
+        }
+        // 批量上传按钮
+        if (self.options.controls['upload-multiple'] === true) {
+          controls.push('<button type="button" class="ctrl-multiple-upload btn ' + self.options.controls['upload-multiple-style'] + '">' + self.options.controls['upload-multiple-content'] + '</button>');
+        }
+        // 清空按钮
+        if (self.options.controls['clear'] === true) {
+          controls.push('<button type="button" class="ctrl-clear btn ' + self.options.controls['clear-style'] + '">' + self.options.controls['clear-content'] + '</button>');
+        }
+      }
+      
+      const html = [];
+      html.push('<input class="file-input" type="file" accept="' + self.options.acceptMime + '"/>')
+      if (controls.length > 0) {
+      	html.push('<div class="controls">');
+      	html.push(controls.join('\n'));
+      	html.push('</div>');
+      }
+      
+      // 文件列表
+      switch (self.options['list-type']) {
+        case 'picture-card': // 图片卡片选择器
+          html.push('<ul class="file-list ' + self.options['list-type'] + '"></ul>');
+          if (self.options.controls['picture-choose'] === true) {
+            html.push('<div class="picture-choose ctrl-choose ' + self.options.controls['picture-choose-style'] + '">');
+            html.push(self.options.controls['picture-choose-content']);
+            html.push('</div>');
+          }
+          break;
+        case 'picture-placeholder': // // 图片卡片占位
+          html.push('<ul class="file-list ' + self.options['list-type'] + '">');
+          for (let i = 1; i <= self.options.limit; i++) {
+            html.push('<div class="picture-choose ctrl-choose ' + self.options.controls['picture-choose-style'] + '" data-sort="' + i + '" data-on="false">');
+            if (self.options.controls['picture-choose-content-list'].length >= i) {
+              html.push(self.options.controls['picture-choose-content-list'][i-1]);
+            } else {
+              html.push(self.options.controls['picture-choose-content']);
+            }
+            html.push('</div>');
+          }
+          html.push('</ul>');
+          break;
+        default:
+          html.push('<ul class="file-list ' + self.options['list-type'] + '"></ul>');
+      }
+      
+      self.element.addClass('file-upload-wrap').append(html.join('\n'));
+      return true;
+    },
+    /**
      * @description 注册事件
      */
     when: function() {
@@ -238,6 +293,10 @@
       // 事件监听
       $elem.on('click', '.ctrl-choose', function() {
         // 选择文件事件 before
+        if (self.options['list-type'] === 'picture-placeholder') {
+          $('.file-list .picture-choose', self.element).attr('data-on', false);
+          $(this).attr('data-on', true);
+        }
         self.choose();
       }).on('change', '.file-input:input[type="file"]', function() {
         // 选择文件事件 on
@@ -259,7 +318,11 @@
         // 删除事件
         const $item = $(this).closest('.file-item');
         self.remove($item.attr('data-key'));
+      }).on('click', '.ctrl-preview', function() {
+        console.log('未实现预览功能');
       });
+      // TODO 2 图片预览
+      // TODO 3 拖拽上传
     },
     /**
      * @description 选择文件前
@@ -267,13 +330,14 @@
     choose: function() {
       const self = this;
       if (!self.canAppend(1)) {
+        console.log('choose', self)
         self.msg(EventChoose, MsgInfo, self.options['msg']['limit']);
         return false
       }
       
       // 选择文件前的钩子
       if (self.options['before-choose'] != null && $.isFunction(self.options['before-choose'])) {
-        // return false可中断默认行为
+        // return false可拒绝选择文件
         if (self.options['before-choose'](self.fileList) === false) {
           return false
         }
@@ -320,7 +384,7 @@
 			
 			// 选择文件的钩子
 			if (self.options['on-choose'] != null && $.isFunction(self.options['on-choose'])) {
-			  // return false可中断默认行为
+			  // return false可拒绝选择文件
 			  if (self.options['on-choose'](elem, file, self.fileList) === false) {
 			    return false
 			  }
@@ -328,6 +392,7 @@
 			
       self.pushFileElem(file);
       self.fileList.push(file);
+      self.togglePictureCardChoose();
             
       // 自动上传
       if (self.options['auto'] === true) {
@@ -362,7 +427,7 @@
 			// 查找文件
 			const file = self.findFile(key);
 			if (!file) {
-				self.msg(EventUpload, MsgError, '查找文件失败', key)
+				self.msg(EventUpload, MsgError, '查找文件失败：key = ' + key + '[' + typeof key + ']')
 				return false
 			}
       
@@ -394,7 +459,7 @@
 			
 			// 上传文件前的钩子
 			if (self.options['on-upload'] != null && $.isFunction(self.options['on-upload'])) {
-			  // return false可中断默认行为
+			  // return false可拒绝默认上传动作
 			  if (self.options['on-upload'](file, self.fileList) === false) {
 			    return false
 			  }
@@ -431,7 +496,7 @@
         success: function(res,status,xhr) {
           // 上传成功后的钩子
           if (self.options['on-success'] != null && $.isFunction(self.options['on-success'])) {
-            // return false可中断默认行为
+            // return false可拒绝默认更新文件属性动作
             if (self.options['on-success'](res, file, self.fileList) === false) {
               return false
             }
@@ -442,7 +507,7 @@
         error: function(xhr,status,error) {
           // 上传失败后的钩子
           if (self.options['on-error'] != null && $.isFunction(self.options['on-error'])) {
-            // return false可中断默认行为
+            // return false可拒绝默认更新文件属性动作
             if (self.options['on-error'](xhr.status, xhr.responseJSON, file, self.fileList) === false) {
               return false
             }
@@ -461,7 +526,7 @@
       const self = this;
       const file = self.findFile(key);;
       if (!file) {
-      	self.msg(EventUpdate, MsgError, '查找文件失败', key)
+				self.msg(EventUpdate, MsgError, '查找文件失败：key = ' + key + '[' + typeof key + ']')
       	return false
       }
       self._update(file, option);
@@ -533,6 +598,8 @@
 				self.fileList.push(file);
       }
       
+      self.togglePictureCardChoose();
+      
       self.change();
       return true
     },
@@ -556,6 +623,8 @@
         self.fileList.splice(index+i, 0, file);
       }
       
+      self.togglePictureCardChoose();
+      
       self.change();
       return true
     },
@@ -568,13 +637,13 @@
 			
 			const file = self.findFile(key);;
 			if (!file) {
-				self.msg(EventRemove, MsgError, '查找文件失败', key)
+				self.msg(EventRemove, MsgError, '查找文件失败：key = ' + key + '[' + typeof key + ']')
 				return false
 			}
       
       // 删除前的钩子
       if (self.options['on-remove'] != null && $.isFunction(self.options['on-remove'])) {
-        // return false可中断默认行为
+        // return false可拒绝删除动作
         if (self.options['on-remove'](file, self.fileList) === false) {
           return false
         }
@@ -589,6 +658,7 @@
 			for (let i = 0; i < len; i++) {
 			  if (self.fileList[i].key === file.key) {
 					self.fileList.splice(i, 1);
+          self.togglePictureCardChoose();
 					self.change();
 					break;
 			  }
@@ -605,7 +675,7 @@
       
       // 清空前的钩子
       if (self.options['on-clear'] != null && $.isFunction(self.options['on-clear'])) {
-        // return false可中断默认行为
+        // return false可拒绝删除动作
         if (self.options['on-clear'](self.fileList) === false) {
           return false
         }
@@ -615,6 +685,7 @@
       self.fileList = [];
       $elem.children('.file-list').html('');
       
+      self.togglePictureCardChoose();
       self.change();
       return true
     },
@@ -687,34 +758,31 @@
      * @param {string} event 事件
      * @param {string} level 消息级别
      * @param {string} msg 消息内容
-     * @param {number} key 文件关键字
      * @description 消息通知
      */
-    msg: function(event, level, msg, key) {
+    msg: function(event, level, msg) {
       const self = this;
       
       // 提示消息的钩子
       if (self.options['on-msg'] != null && $.isFunction(self.options['on-msg']) && level.match(new RegExp(self.options['subscribeMessage']))) {
-        self.options['on-msg'](event, level, msg, key, self.fileList);
+        self.options['on-msg'](event, level, msg, self.fileList);
       } else {
         switch(level) {
           case MsgLog:
-            console.log('file-upload-msg', event, level, msg, key);
+            console.log('file-upload-msg', event, level, msg);
             break;
           case MsgInfo: 
-            console.info('file-upload-msg', event, level, msg, key);
-						alert(msg);
+            console.info('file-upload-msg', event, level, msg);
             break;
           case MsgWarn:
-            console.warn('file-upload-msg', event, level, msg, key);
-						alert(msg);
+            console.warn('file-upload-msg', event, level, msg);
             break;
           case MsgError:
-            console.error('file-upload-msg', event, level, msg, key);
+            console.error('file-upload-msg', event, level, msg);
 						alert(msg);
             break;
           default:
-            console.log('file-upload-msg', event, level, msg, key);
+            console.log('file-upload-msg', event, level, msg);
 						alert(msg);
         }
       }
@@ -813,6 +881,17 @@
     pushFileElem: function(file) {
       const self = this;
       const tpl = self.createFileElemTpl(file);
+      
+      // 图片卡片占位
+      if (self.options['list-type'] === 'picture-placeholder') {
+        let $choose = $('.file-list .picture-choose[data-on="true"]', self.element);
+        if (!$choose || $choose.length === 0) {
+          $choose = $('.file-list .picture-choose[data-sort="' + (self.fileList.length + 1) + '"]', self.element);
+        }
+        $(tpl).insertBefore($choose);
+        return true
+      }
+      
       self.element.children('.file-list').append(tpl);
 			return true
     },
@@ -828,12 +907,40 @@
 				return self.pushFileElem(file)
 			}
 			
-      const $elem = self.findElem(self.fileList[index].key);
-			if (!$elem) {
-				return self.pushFileElem(file);
-			}
       const tpl = self.createFileElemTpl(file);
+      
+      let $elem = undefined;
+      // 图片卡片占位
+      if (self.options['list-type'] === 'picture-placeholder') {
+        $elem = $('.file-list .picture-choose[data-on="true"]', self.element);
+        if (!$elem || $elem.length === 0) {
+          $elem = $('.file-list .picture-choose[data-sort="' + (self.fileList.length + 1) + '"]', self.element);
+        }
+      } else {
+        $elem = self.findElem(self.fileList[index].key);
+      }
+      
       $(tpl).insertBefore($elem);
+			return true
+    },
+    /**
+     * @param {object} file 文件
+     * @description 刷新文件节点
+     */
+    refreshItemElem: function(file) {
+      const self = this;
+      
+			const $elem = self.findElem(file.key);
+			if (!$elem) {
+				return false
+			}
+      $elem.removeClass('is-default is-doing is-uploading is-finish is-success is-failure is-warning').addClass(self.getStatusClass(file.status));
+			$elem.find('.file-name').attr('href', (file.url || file.originUrl));
+			if (self.options.download === true) {
+				$elem.attr('download', file.name || '');
+			}
+      $elem.find('.upload-image').attr('src', (file.url || file.originUrl));
+			$elem.find('.file-status-icon').html(self.getStatusIcon(file.status));
 			return true
     },
     /**
@@ -859,6 +966,7 @@
           html.push('</span>');
           break;
         case 'picture-card': // 图片卡片列表
+        case 'picture-placeholder': // 图片卡片占位列表
 					html.push('<img class="upload-image" src="' + (file.originUrl || file.url) + '">');
 					html.push('<span class="file-status-icon">')
           html.push(self.getStatusIcon(file.status));
@@ -886,24 +994,19 @@
       return html.join('\n');
     },
     /**
-     * @param {object} file 文件
-     * @description 刷新文件节点
+     * @description 切换图片卡片选择器状态
      */
-    refreshItemElem: function(file) {
+    togglePictureCardChoose: function() {
       const self = this;
+      if(self.options['list-type'] === 'picture-card' && self.options.controls['picture-choose'] === true) {
+        if (!self.canAppend(1)) {
+        	self.element.children('.picture-choose').addClass('hide');
+        } else {
+        	self.element.children('.picture-choose').removeClass('hide');
+        }
+      }
       
-			const $elem = self.findElem(file.key);
-			if (!$elem) {
-				return false
-			}
-      $elem.removeClass('is-default is-doing is-uploading is-finish is-success is-failure is-warning').addClass(self.getStatusClass(file.status));
-			$elem.find('.file-name').attr('href', (file.url || file.originUrl));
-			if (self.options.download === true) {
-				$elem.attr('download', file.name || '');
-			}
-			//$elem.find('<img class="upload-image" src="' + (file.url || file.originUrl) + '">');
-			$elem.find('.file-status-icon').html(self.getStatusIcon(file.status));
-			return true
+      return true;
     },
 		/**
 		 * @param {number} status
@@ -913,19 +1016,19 @@
 			const self = this;
 			switch (status) {
 			  case UploadDefault:
-				  return self.options.status['default-icon'];
+				  return self.options['status-icon']['default-icon'];
 					break;
 				case Uploading:
-				  return self.options.status['uploading-icon'];
+				  return self.options['status-icon']['uploading-icon'];
 					break;
 				case UploadFinish:
-				  return self.options.status['finish-icon'];
+				  return self.options['status-icon']['finish-icon'];
 					break;
 				case UploadSuccess:
-				  return self.options.status['success-icon'];
+				  return self.options['status-icon']['success-icon'];
 					break;
 				case UploadFailure:
-			    return self.options.status['failure-icon'];
+			    return self.options['status-icon']['failure-icon'];
 					break;
 			  default:
 					return '';
