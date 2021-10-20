@@ -179,6 +179,7 @@
 	border: 1px solid #f1f1f1;
 	border-radius: 6px;
 	padding: 5px 5px 5px 85px;
+  line-height: 70px;
 }
 
 .file-upload-wrap .file-list.picture > .file-item > .upload-image {
@@ -190,10 +191,6 @@
   vertical-align: middle;
 	background-color: #fff;
   object-fit: cover;
-}
-
-.file-upload-wrap .file-list.picture > .file-item .file-name { 
-	line-height: 70px;
 }
 
 .file-upload-wrap .file-list.picture > .file-item:hover .file-preview-icon {
@@ -312,11 +309,79 @@
 	background-color: rgb(217, 236, 255);
 }
 
-.file-upload-wrap .picture-choose:after {
+.file-upload-wrap .picture-choose::after {
 	display: inline-block;
 	content: "";
 	height: 100%;
 	vertical-align: middle;
+}
+
+/* 图片预览 */
+.file-upload-wrap .picture-preview {
+  position: fixed;
+  display: none;
+  z-index: 2021;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, .5);
+}
+
+.file-upload-wrap .picture-preview-close {
+	position: absolute;
+	top: -40px;
+	right: -40px;
+	width: 80px;
+	height: 80px;
+	background-color: rgba(0, 0, 0, .3);
+	border-radius: 50%;
+	color: #fff;
+  cursor: pointer;
+  transition: .1s;
+}
+
+.file-upload-wrap .picture-preview-close:hover {
+  background-color: rgba(0, 0, 0, .4);
+}
+
+.file-upload-wrap .picture-preview-close span {
+	position: relative;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	display: inline-block;
+}
+
+.file-upload-wrap .picture-preview-close span * {
+	position: absolute;
+	left: 15px;
+	bottom: 15px;
+}
+
+.file-upload-wrap .picture-preview .picture-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.file-upload-wrap .picture-preview .picture-wrap li {
+  display: none;
+}
+
+.file-upload-wrap .picture-preview .picture-wrap li.on {
+  display: inline-block;
+}
+
+.file-upload-wrap .picture-preview .picture-wrap img {
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 /* default button */

@@ -57,7 +57,6 @@
     'data': [],       // 预设文件列表，['http://a.com/a.jpg', 'http://b.cn/b.png']
     
     'list-type': 'text', // 文件列表样式 text（文件列表）、picture（图片列表）、picture-card（图片卡片列表）、picture-placeholder（图片卡片占位）
-    'preview': false,    // 是否启动图片预览
     
     'subscribeMessage': 'info|warn|error', // 订阅消息
     
@@ -98,7 +97,7 @@
       'remove': true,                                                        // 删除按钮
       'remove-style': '',                                                    // 删除按钮样式
       'remove-content': '<i class="fa fa-trash fa-fw"></i>',                 // 删除按钮内容
-			'preview':true,                                                        // 预览按钮
+			'preview':false,                                                       // 预览按钮
 			'preview-style': '',                                                   // 预览按钮样式
 			'preview-content': '<i class="fa fa-search-plus fa-fw"></i>',          // 预览按钮内容
 			'picture-choose': false,                                               // 图片选择卡片
@@ -119,15 +118,20 @@
     'on-change': null,     // 数据变更的钩子
     'on-msg': null,        // 提示消息的钩子
   };
+  
+  // 图片列表默认配置
+  const pictureOption = {
+    'controls': {'preview': true}
+  }
 	
 	// 图片卡片默认配置
 	const pictureCardOption = {
-		'controls': {'choose': false, 'picture-choose': true}
+		'controls': {'choose': false, 'preview': true, 'picture-choose': true}
 	}
   
   // 图片卡片占位默认配置
   const picturePlaceholderOption = {
-    'controls': {'choose': false}
+    'controls': {'choose': false, 'preview': true}
   }
 
   /**
@@ -163,18 +167,16 @@
       // 添加已上传文件列表
       const preFileList = [];
       for (let i = 0; i < self.options.data.length; i++) {
-				let file;
 				switch (typeof self.options.data[i]) {
 					case 'string': 
-						file = self.createFileObj(self.options.data[i], UploadFinish);
+            preFileList.push({'url': self.options.data[i], 'status': UploadFinish});
 						break;
 					case 'object':
-						file = self.createFileObj(self.options.data[i].url, UploadFinish, self.options.data[i].name)
+            preFileList.push({'url': self.options.data[i].url, 'status': UploadFinish, 'name': self.options.data[i].name});
 						break;
 					default:
 						continue;
 				}
-        preFileList.push(file);
       }
       if (preFileList.length > 0) {
         self.push(preFileList);
@@ -190,10 +192,12 @@
       // 特殊样式
       let special = {};
       switch(option['list-type']) {
-        case 'picture-card': // 图片卡片
+        case 'picture': // 图片列表
+          special = pictureOption;
+        case 'picture-card': // 图片卡片列表
           special = pictureCardOption;
           break;
-        case 'picture-placeholder': // 图片卡片占位
+        case 'picture-placeholder': // 图片卡片占位列表
           special = picturePlaceholderOption;
           break;
         default:
@@ -281,6 +285,16 @@
           html.push('<ul class="file-list ' + self.options['list-type'] + '"></ul>');
       }
       
+      // 图片预览
+      if (self.options.controls['preview'] === true) {
+        html.push('<div class="picture-preview">');
+        html.push('<ul class="picture-wrap"></ul>');
+        html.push('<div class="picture-preview-close"><span class="picture-pc"><i class="fa fa-remove"></i></span></div>');
+        html.push('<div class="picture-controls">');
+        html.push('</div>');
+        html.push('</div>');
+      }
+      
       self.element.addClass('file-upload-wrap').append(html.join('\n'));
       return true;
     },
@@ -289,9 +303,8 @@
      */
     when: function() {
       const self = this;
-      const $elem = self.element;
       // 事件监听
-      $elem.on('click', '.ctrl-choose', function() {
+      self.element.on('click', '.ctrl-choose', function() {
         // 选择文件事件 before
         if (self.options['list-type'] === 'picture-placeholder') {
           $('.file-list .picture-choose', self.element).attr('data-on', false);
@@ -319,10 +332,106 @@
         const $item = $(this).closest('.file-item');
         self.remove($item.attr('data-key'));
       }).on('click', '.ctrl-preview', function() {
-        console.log('未实现预览功能');
+        // 图片预览事件
+        const $item = $(this).closest('.file-item');
+        self.openPreview($item.attr('data-key'));
+      }).on('click', '.picture-preview-close', function() {
+        // 关闭图片预览事件
+        self.closePreview();
+      }).on('mousedown', '.picture-wrap img', function(ev) {
+        // 图片拖动事件
+        const $elem = $(this);
+        
+        const offset = $elem.position();
+        var disX = ev.clientX - offset.left;
+        var disY = ev.clientY - offset.top;
+        document.onmousemove=function(ev){
+          var l=ev.clientX-disX;
+          var t=ev.clientY-disY;
+          $elem.css('left', l + 'px');
+          $elem.css('top', t + 'px');
+        };
+        document.onmouseup=function(){
+          document.onmousemove=null;
+          document.onmouseup=null;
+        };
+        return false;
+      }).on('click', '.picture-wrap img', function() {
+        // 点击图片时不触发关闭事件
+        return false;
+      }).on('click', '.picture-wrap', function() {
+        self.closePreview();
       });
-      // TODO 2 图片预览
-      // TODO 3 拖拽上传
+    },
+    /**
+     * @param {object} url
+     * @param {object} callback
+     * @description 获取图片宽高
+     */
+    getImageSize: function(url, callback){
+    	var img = new Image();
+    	img.src = url;
+    	
+    	// 缓存数据
+    	if (img.complete){
+    	  callback(img.width, img.height);
+    	} else {
+    	  img.onload = function(){
+          callback(img.width, img.height);
+        }
+      }
+    },
+    /**
+     * @param {string（或number）} key 文件关键字（或文件索引）
+     * @description 打开图片预览窗口
+     */
+    openPreview: function(key) {
+      const self = this;
+      
+      // 文件索引
+      let index = -1;
+      if (typeof key == 'string') {
+      	const len = self.fileList.length;
+      	for (let i = 0; i < len; i++) {
+      	  if (self.fileList[i].key === key) {
+      	    index = i;
+      			break
+      		}
+      	}
+      } else if (typeof key == 'number') {
+      	index = key;
+      }
+      if (index < 0 || index >= self.fileList.length) {
+        return false;
+      }
+      
+      const pics = [];
+      for (let i = 0; i < self.fileList.length; i++) {
+        pics.push('<li class="' + (i === index ? 'on' : '') + '"><img src="' + (self.fileList[i].url || self.fileList[i].originUrl) + '" style="display:none;"/></li>');
+      }
+      // 预览节点
+      const $elem = self.element.children('.picture-preview').fadeIn(500);
+      // 预览图片包裹节点
+      const $wrap = $elem.children('.picture-wrap').html(pics.join('\n'));
+      
+      const wrapWidth = $wrap.outerWidth(true);
+      const wrapHeight = $wrap.outerHeight(true);
+      $wrap.find('li img').each(function(index, elem) {
+        self.getImageSize($(elem).attr('src'), function(width, height) {
+          $(elem).css('left', (wrapWidth - width) / 2 + 'px');
+          $(elem).css('top', (wrapHeight - height) / 2 + 'px');
+          $(elem).show(250);
+        })
+      })
+    },
+    /**
+     * @description 关闭图片预览窗口
+     */
+    closePreview: function() {
+      const self = this;
+      const $elem = self.element.children('.picture-preview');
+      $elem.children('.picture-wrap').html('');
+      $elem.fadeOut(500);
     },
     /**
      * @description 选择文件前
@@ -330,7 +439,6 @@
     choose: function() {
       const self = this;
       if (!self.canAppend(1)) {
-        console.log('choose', self)
         self.msg(EventChoose, MsgInfo, self.options['msg']['limit']);
         return false
       }
@@ -581,10 +689,9 @@
 		},
     /**
      * @param {array} fileList 文件列表
-     * @param {number} index 插入索引位置
      * @description 在当前文件列表尾部追加文件
      */
-    push: function(fileList, index) {
+    push: function(fileList) {
       const self = this;
       if (!self.canAppend(fileList.length)) {
         self.msg(EventPush, MsgInfo, self.options['msg']['limit']);
@@ -814,10 +921,6 @@
     createFileObj: function(url, status, name, originUrl, originData) {
       const self = this;
 			
-			if (!name) {
-				name = url.substring(url.lastIndexOf('/') + 1) || url.substring(url.lastIndexOf('/') + 1) || '';
-			}
-			
 			self.fileKey++;
 			const file = {
 				'key': self.fileKey + '',          // 文件关键字，唯一
@@ -827,6 +930,12 @@
 				'originUrl': originUrl || '',      // 预览地址
 				'originData': originData || null,  // 预览数据
 			}
+      
+      // 若文件名为空，则尝试取url地址，若地址为空，则默认显示“文件”+key
+      if (file.name === '') {
+      	file.name = file.url.substring(file.url.lastIndexOf('/') + 1) || '文件' + file.key;
+      }
+      
 			return file;
     },
     /**
@@ -960,8 +1069,10 @@
           html.push(self.getStatusIcon(file.status));
 					html.push('</span>');
           html.push('<span class="upload-file-control full">');
-					html.push('<span class="file-preview-icon ctrl-preview ' + self.options.controls['preview-style'] + '">' + self.options.controls['preview-content'] + '</span>');
-          html.push('<span class="file-upload-icon ctrl-upload ' + self.options.controls['upload-style'] + '">' + self.options.controls['upload-content'] + '</span>');
+          if (self.options.controls['preview'] === true) {
+            html.push('<span class="file-preview-icon ctrl-preview ' + self.options.controls['preview-style'] + '">' + self.options.controls['preview-content'] + '</span>');
+          }
+					html.push('<span class="file-upload-icon ctrl-upload ' + self.options.controls['upload-style'] + '">' + self.options.controls['upload-content'] + '</span>');
           html.push('<span class="file-remove-icon ctrl-remove ' + self.options.controls['remove-style'] + '">' + self.options.controls['remove-content'] + '</span>');
           html.push('</span>');
           break;
@@ -972,8 +1083,10 @@
           html.push(self.getStatusIcon(file.status));
 					html.push('</span>');
 					html.push('<span class="upload-file-control full">');
-					html.push('<span class="file-preview-icon ctrl-preview ' + self.options.controls['preview-style'] + '">' + self.options.controls['preview-content'] + '</span>');
-          html.push('<span class="file-upload-icon ctrl-upload ' + self.options.controls['upload-style'] + '">' + self.options.controls['upload-content'] + '</span>');
+          if (self.options.controls['preview'] === true) {
+            html.push('<span class="file-preview-icon ctrl-preview ' + self.options.controls['preview-style'] + '">' + self.options.controls['preview-content'] + '</span>');
+          }
+					html.push('<span class="file-upload-icon ctrl-upload ' + self.options.controls['upload-style'] + '">' + self.options.controls['upload-content'] + '</span>');
           html.push('<span class="file-remove-icon ctrl-remove ' + self.options.controls['remove-style'] + '">' + self.options.controls['remove-content'] + '</span>');
 					html.push('</span>');
           break;
@@ -984,8 +1097,7 @@
           html.push(self.getStatusIcon(file.status));
 					html.push('</span>');
 					html.push('<span class="upload-file-control">');
-					html.push('<span class="file-preview-icon ctrl-preview ' + self.options.controls['preview-style'] + '">' + self.options.controls['preview-content'] + '</span>');
-          html.push('<span class="file-upload-icon ctrl-upload ' + self.options.controls['upload-style'] + '">' + self.options.controls['upload-content'] + '</span>');
+					html.push('<span class="file-upload-icon ctrl-upload ' + self.options.controls['upload-style'] + '">' + self.options.controls['upload-content'] + '</span>');
           html.push('<span class="file-remove-icon ctrl-remove ' + self.options.controls['remove-style'] + '">' + self.options.controls['remove-content'] + '</span>');
           html.push('</span>');
       }
