@@ -1,5 +1,5 @@
 /*!
- * jquery-file-upload v1.0 (https://github.com/honguangli/jquery-file-upload)
+ * jquery-file-upload v1.0beta (https://github.com/honguangli/jquery-file-upload)
  * Copyright honguangli
  * Licensed under the MIT license
  */
@@ -66,15 +66,6 @@
       'maxSize': '文件大小超出',          // 文件大小超出上限时的提示消息
     },
     
-    // 状态图标
-    'status-icon': {
-			'default-icon': '<i class="fa fa-exclamation-circle fa-fw"></i>', // 未上传图标
-			'uploading-icon': '<i class="fa fa-spinner fa-fw fa-pulse"></i>', // 上传中图标
-			'finish-icon': '<i class="fa fa-check-circle-o fa-fw"></i>',      // 已上传图标
-			'success-icon': '<i class="fa fa-check-circle-o fa-fw"></i>',     // 上传成功图标
-			'failure-icon': '<i class="fa fa-exclamation-circle fa-fw"></i>', // 上传失败图标
-    },
-    
     // 控制器
     'controls': {                 
       'hide': false,                                                         // 是否隐藏全部控制器
@@ -91,6 +82,7 @@
       'clear': false ,                                                       // 清空按钮
       'clear-style': 'btn-danger btn-mini',                                  // 清空按钮样式
       'clear-content': '<i class="fa fa-trash fa-fw"></i>',                  // 清空按钮内容
+      'full': false,                                                         // 文件项控制器是否铺满
       'upload': true,                                                        // 上传按钮
       'upload-style': '',                                                    // 上传按钮样式
       'upload-content': '<i class="fa fa-cloud-upload fa-fw"></i>',          // 上传按钮内容
@@ -104,6 +96,18 @@
 			'picture-choose-style': '',                                            // 图片选择卡片样式
 			'picture-choose-content': '<i class="fa fa-plus fa-fw"></i>',          // 图片选择卡片内容
       'picture-choose-content-list': [],                                     // 图片选择卡片内容列表 图片卡片占位列表时应用本字段
+    },
+    
+    // 图标
+    'icon': {
+			'default-icon': '<i class="fa fa-exclamation-circle fa-fw"></i>', // 未上传图标
+			'uploading-icon': '<i class="fa fa-spinner fa-fw fa-pulse"></i>', // 上传中图标
+			'finish-icon': '<i class="fa fa-check-circle-o fa-fw"></i>',      // 已上传图标
+			'success-icon': '<i class="fa fa-check-circle-o fa-fw"></i>',     // 上传成功图标
+			'failure-icon': '<i class="fa fa-exclamation-circle fa-fw"></i>', // 上传失败图标
+      'file-icon': '<i class="fa fa-file-text-o fa-fw"></i>',           // 文件图标
+      'left-icon': '<i class="fa fa-chevron-left fa-fw"></i>',          // 预览上一张图片
+      'right-icon': '<i class="fa fa-chevron-right fa-fw"></i>',        // 预览下一张图片
     },
     
     // 钩子函数
@@ -121,17 +125,17 @@
   
   // 图片列表默认配置
   const pictureOption = {
-    'controls': {'preview': true}
+    'controls': {'preview': true, 'full': true}
   }
 	
 	// 图片卡片默认配置
 	const pictureCardOption = {
-		'controls': {'choose': false, 'preview': true, 'picture-choose': true}
+		'controls': {'choose': false, 'full': true, 'preview': true, 'picture-choose': true}
 	}
   
   // 图片卡片占位默认配置
   const picturePlaceholderOption = {
-    'controls': {'choose': false, 'preview': true}
+    'controls': {'choose': false, 'full': true, 'preview': true}
   }
 
   /**
@@ -175,12 +179,10 @@
             preFileList.push({'url': self.options.data[i].url, 'status': UploadFinish, 'name': self.options.data[i].name});
 						break;
 					default:
-						continue;
 				}
       }
       if (preFileList.length > 0) {
         self.push(preFileList);
-        self.bind();
       }
     },
     /**
@@ -207,9 +209,6 @@
       const config = $.extend(true, {}, defaults, special, option);
       
       // 参数修正
-      if (typeof config.multiple !== 'boolean') {
-        config.multiple = false;
-      }
       if (!config.multiple) {
         config.limit = 1;
       }
@@ -218,7 +217,6 @@
       }
       
       config.msg['limit'] = config.msg['limit'].replace(new RegExp('{limit}'), config['limit'])
-      config.msg['maxSize'] = config.msg['maxSize'].replace(new RegExp('{maxSize}'), config['maxSize'])
       
       self.options = config;
       return true;
@@ -230,39 +228,39 @@
       const self = this;
       
       // 控制器
-      const controls = [];
-      if (self.options.controls['hide'] === false) {
+      const ctrls = [];
+      if (!self.options.controls['hide']) {
         // 选择文件按钮
-        if (self.options.controls['choose'] === true) {
-          controls.push('<button type="button" class="ctrl-choose btn ' + self.options.controls['choose-style'] + '">' + self.options.controls['choose-content'] + '</button>');
+        if (self.options.controls['choose']) {
+          ctrls.push('<button type="button" class="ctrl-choose btn ' + self.options.controls['choose-style'] + '">' + self.options.controls['choose-content'] + '</button>');
         }
         // 显示隐藏按钮
-        if (self.options.controls['display'] === true) {
-          controls.push('<button type="button" class="ctrl-display btn ' + self.options.controls['display-style'] + '" data-display="true">' + self.options.controls['display-hide-content'] + '</button>');
+        if (self.options.controls['display']) {
+          ctrls.push('<button type="button" class="ctrl-display btn ' + self.options.controls['display-style'] + '" data-display="true">' + self.options.controls['display-hide-content'] + '</button>');
         }
         // 批量上传按钮
-        if (self.options.controls['upload-multiple'] === true) {
-          controls.push('<button type="button" class="ctrl-multiple-upload btn ' + self.options.controls['upload-multiple-style'] + '">' + self.options.controls['upload-multiple-content'] + '</button>');
+        if (self.options.controls['upload-multiple']) {
+          ctrls.push('<button type="button" class="ctrl-multiple-upload btn ' + self.options.controls['upload-multiple-style'] + '">' + self.options.controls['upload-multiple-content'] + '</button>');
         }
         // 清空按钮
-        if (self.options.controls['clear'] === true) {
-          controls.push('<button type="button" class="ctrl-clear btn ' + self.options.controls['clear-style'] + '">' + self.options.controls['clear-content'] + '</button>');
+        if (self.options.controls['clear']) {
+          ctrls.push('<button type="button" class="ctrl-clear btn ' + self.options.controls['clear-style'] + '">' + self.options.controls['clear-content'] + '</button>');
         }
       }
       
       const html = [];
       html.push('<input class="file-input" type="file" accept="' + self.options.acceptMime + '"/>')
-      if (controls.length > 0) {
+      if (ctrls.length > 0) {
       	html.push('<div class="controls">');
-      	html.push(controls.join('\n'));
+      	html.push(ctrls.join('\n'));
       	html.push('</div>');
       }
       
-      // 文件列表
+      // 文件列表样式
       switch (self.options['list-type']) {
         case 'picture-card': // 图片卡片选择器
           html.push('<ul class="file-list ' + self.options['list-type'] + '"></ul>');
-          if (self.options.controls['picture-choose'] === true) {
+          if (self.options.controls['picture-choose']) {
             html.push('<div class="picture-choose ctrl-choose ' + self.options.controls['picture-choose-style'] + '">');
             html.push(self.options.controls['picture-choose-content']);
             html.push('</div>');
@@ -272,11 +270,7 @@
           html.push('<ul class="file-list ' + self.options['list-type'] + '">');
           for (let i = 1; i <= self.options.limit; i++) {
             html.push('<div class="picture-choose ctrl-choose ' + self.options.controls['picture-choose-style'] + '" data-sort="' + i + '" data-on="false">');
-            if (self.options.controls['picture-choose-content-list'].length >= i) {
-              html.push(self.options.controls['picture-choose-content-list'][i-1]);
-            } else {
-              html.push(self.options.controls['picture-choose-content']);
-            }
+            html.push(self.options.controls['picture-choose-content-list'].length >= i ? self.options.controls['picture-choose-content-list'][i-1] : self.options.controls['picture-choose-content']);
             html.push('</div>');
           }
           html.push('</ul>');
@@ -286,11 +280,13 @@
       }
       
       // 图片预览
-      if (self.options.controls['preview'] === true) {
+      if (self.options.controls['preview']) {
         html.push('<div class="picture-preview">');
         html.push('<ul class="picture-wrap"></ul>');
         html.push('<div class="picture-preview-close"><span class="picture-pc"><i class="fa fa-remove"></i></span></div>');
-        html.push('<div class="picture-controls">');
+        html.push('<div class="picture-preview-controls">');
+        html.push('<span class="ctrl-prev">' + self.options.icon['left-icon'] + '</span>');
+        html.push('<span class="ctrl-next">' + self.options.icon['right-icon'] + '</span>');
         html.push('</div>');
         html.push('</div>');
       }
@@ -311,37 +307,45 @@
           $(this).attr('data-on', true);
         }
         self.choose();
+        return false;
       }).on('change', '.file-input:input[type="file"]', function() {
         // 选择文件事件 on
         self._choose(this);
+        return false;
       }).on('click', '.ctrl-display', function() {
         // 显示隐藏文件列表事件
         self.display($(this).attr('data-display') === 'false');
+        return false;
       }).on('click', '.ctrl-multiple-upload', function() {
         // 批量上传事件
         self.uploadMultiple();
+        return false;
       }).on('click', '.ctrl-clear', function() {
         // 清空事件
         self.clear();
+        return false;
       }).on('click', '.ctrl-upload', function() {
         // 上传事件
         const $item = $(this).closest('.file-item');
         self.upload($item.attr('data-key'));
+        return false;
       }).on('click', '.ctrl-remove', function() {
         // 删除事件
         const $item = $(this).closest('.file-item');
         self.remove($item.attr('data-key'));
+        return false;
       }).on('click', '.ctrl-preview', function() {
         // 图片预览事件
         const $item = $(this).closest('.file-item');
         self.openPreview($item.attr('data-key'));
+        return false;
       }).on('click', '.picture-preview-close', function() {
         // 关闭图片预览事件
         self.closePreview();
+        return false;
       }).on('mousedown', '.picture-wrap img', function(ev) {
         // 图片拖动事件
         const $elem = $(this);
-        
         const offset = $elem.position();
         var disX = ev.clientX - offset.left;
         var disY = ev.clientY - offset.top;
@@ -359,79 +363,64 @@
       }).on('click', '.picture-wrap img', function() {
         // 点击图片时不触发关闭事件
         return false;
-      }).on('click', '.picture-wrap', function() {
+      }).on('click', '.picture-preview', function() {
+        // 关闭图片预览事件
         self.closePreview();
+        return false;
+      }).on('click', '.ctrl-prev', function() {
+        // 预览上一张图片事件
+        const $curr = $('.picture-preview .picture-wrap li.on', self.element);
+        if ($curr.prev().length === 0) {
+          $curr.removeClass('on');
+          $('.picture-preview .picture-wrap li:last', self.element).addClass('on');
+          return false
+        }
+        $curr.removeClass('on');
+        $curr.prev().addClass('on');
+        return false;
+      }).on('click', '.ctrl-next', function() {
+        // 预览下一张图片事件
+        const $curr = $('.picture-preview .picture-wrap li.on', self.element);
+        if ($curr.next().length === 0) {
+          $curr.removeClass('on');
+          $('.picture-preview .picture-wrap li:first', self.element).addClass('on');
+          return false
+        }
+        $curr.removeClass('on');
+        $curr.next().addClass('on');
+        return false;
       });
     },
     /**
-     * @param {object} url
-     * @param {object} callback
-     * @description 获取图片宽高
-     */
-    getImageSize: function(url, callback){
-    	var img = new Image();
-    	img.src = url;
-    	
-    	// 缓存数据
-    	if (img.complete){
-    	  callback(img.width, img.height);
-    	} else {
-    	  img.onload = function(){
-          callback(img.width, img.height);
-        }
-      }
-    },
-    /**
-     * @param {string（或number）} key 文件关键字（或文件索引）
+     * @param {string} key 文件关键字
      * @description 打开图片预览窗口
      */
     openPreview: function(key) {
       const self = this;
-      
-      // 文件索引
-      let index = -1;
-      if (typeof key == 'string') {
-      	const len = self.fileList.length;
-      	for (let i = 0; i < len; i++) {
-      	  if (self.fileList[i].key === key) {
-      	    index = i;
-      			break
-      		}
-      	}
-      } else if (typeof key == 'number') {
-      	index = key;
-      }
-      if (index < 0 || index >= self.fileList.length) {
-        return false;
-      }
-      
-      const pics = [];
-      for (let i = 0; i < self.fileList.length; i++) {
-        pics.push('<li class="' + (i === index ? 'on' : '') + '"><img src="' + (self.fileList[i].url || self.fileList[i].originUrl) + '" style="display:none;"/></li>');
-      }
-      // 预览节点
-      const $elem = self.element.children('.picture-preview').fadeIn(500);
-      // 预览图片包裹节点
-      const $wrap = $elem.children('.picture-wrap').html(pics.join('\n'));
-      
+      const $wrap = self.element.children('.picture-preview');
       const wrapWidth = $wrap.outerWidth(true);
       const wrapHeight = $wrap.outerHeight(true);
-      $wrap.find('li img').each(function(index, elem) {
-        self.getImageSize($(elem).attr('src'), function(width, height) {
-          $(elem).css('left', (wrapWidth - width) / 2 + 'px');
-          $(elem).css('top', (wrapHeight - height) / 2 + 'px');
-          $(elem).show(250);
-        })
-      })
+      const pics = [];
+      for (let i = 0; i < self.fileList.length; i++) {
+        const url = self.fileList[i].url || self.fileList[i].originUrl;
+        const on = self.fileList[i].key === key;
+        const left = (wrapWidth - self.fileList[i].width) / 2;
+        const top = (wrapHeight - self.fileList[i].height) / 2;
+        pics.push('<li class="' + (on ? 'on' : '') + '">');
+        pics.push('<img src="' + url + '" style="width: ' + self.fileList[i].width + 'px; height: ' + self.fileList[i].height + 'px; left:' + left + 'px; top: ' + top + 'px"/>');
+        pics.push('</li>');
+      }
+      $wrap.children('.picture-wrap:first').html(pics.join('\n'));
+      $wrap.fadeIn(500);
     },
     /**
      * @description 关闭图片预览窗口
      */
     closePreview: function() {
       const self = this;
-      const $elem = self.element.children('.picture-preview');
-      $elem.children('.picture-wrap').html('');
-      $elem.fadeOut(500);
+      const $wrap = self.element.children('.picture-preview');
+      $wrap.children('.picture-wrap').html('');
+      $wrap.fadeOut(500);
     },
     /**
      * @description 选择文件前
@@ -514,14 +503,12 @@
      */
     display: function(_display) {
       const self = this;
-      
-      const $elem = self.element;
       if (!_display) {
-        $elem.find('.controls .ctrl-display').attr('data-display', 'false').html(self.options.controls["display-show-content"]);
-        $elem.children('.file-list').addClass('hide');
+        self.element.find('.controls .ctrl-display').attr('data-display', 'false').html(self.options.controls["display-show-content"]);
+        self.element.children('.file-list').addClass('hide');
       } else {
-        $elem.find('.controls .ctrl-display').attr('data-display', 'true').html(self.options.controls["display-hide-content"]);
-        $elem.children('.file-list').removeClass('hide');
+        self.element.find('.controls .ctrl-display').attr('data-display', 'true').html(self.options.controls["display-hide-content"]);
+        self.element.children('.file-list').removeClass('hide');
       }
       return true
     },
@@ -693,6 +680,10 @@
      */
     push: function(fileList) {
       const self = this;
+      if (fileList.length <= 0) {
+        self.msg(EventPush, MsgError, '文件列表不能为空');
+        return false
+      }
       if (!self.canAppend(fileList.length)) {
         self.msg(EventPush, MsgInfo, self.options['msg']['limit']);
         return false
@@ -929,11 +920,27 @@
 				'url': url || '',                  // 文件地址
 				'originUrl': originUrl || '',      // 预览地址
 				'originData': originData || null,  // 预览数据
+        'width': 0,                        // 图片宽度
+        'height': 0,                       // 图片高度
 			}
       
       // 若文件名为空，则尝试取url地址，若地址为空，则默认显示“文件”+key
       if (file.name === '') {
       	file.name = file.url.substring(file.url.lastIndexOf('/') + 1) || '文件' + file.key;
+      }
+      
+      switch(self.options['list-type']) {
+        case 'picture': // 图片列表
+        case 'picture-card': // 图片卡片列表
+        case 'picture-placeholder': // 图片卡片占位列表
+          file.width = 640; // 设置默认宽度
+          file.height = 480; // 设置默认高度
+          self.getImageSize(file.url || file.originUrl, function(w, h) {
+            file.width = w;
+            file.height = h;
+          })
+          break;
+        default:
       }
       
 			return file;
@@ -1064,43 +1071,27 @@
       switch (self.options['list-type']) {
         case 'picture': // 图片列表
 					html.push('<img class="upload-image" src="' + (file.originUrl || file.url) + '">');
-          html.push('<a class="file-name" href="' + file.url + (self.options.download === true ? '" download="' + file.name : '') + '">' + file.name + '</a>');
-					html.push('<span class="file-status-icon">')
-          html.push(self.getStatusIcon(file.status));
-					html.push('</span>');
-          html.push('<span class="upload-file-control full">');
-          if (self.options.controls['preview'] === true) {
-            html.push('<span class="file-preview-icon ctrl-preview ' + self.options.controls['preview-style'] + '">' + self.options.controls['preview-content'] + '</span>');
-          }
-					html.push('<span class="file-upload-icon ctrl-upload ' + self.options.controls['upload-style'] + '">' + self.options.controls['upload-content'] + '</span>');
-          html.push('<span class="file-remove-icon ctrl-remove ' + self.options.controls['remove-style'] + '">' + self.options.controls['remove-content'] + '</span>');
-          html.push('</span>');
+          html.push('<a class="file-name" ' + (!self.options.download ? '' : 'href="' + file.url + '" download="' + file.name + '"') + '>' + file.name + '</a>');
           break;
         case 'picture-card': // 图片卡片列表
         case 'picture-placeholder': // 图片卡片占位列表
 					html.push('<img class="upload-image" src="' + (file.originUrl || file.url) + '">');
-					html.push('<span class="file-status-icon">')
-          html.push(self.getStatusIcon(file.status));
-					html.push('</span>');
-					html.push('<span class="upload-file-control full">');
-          if (self.options.controls['preview'] === true) {
-            html.push('<span class="file-preview-icon ctrl-preview ' + self.options.controls['preview-style'] + '">' + self.options.controls['preview-content'] + '</span>');
-          }
-					html.push('<span class="file-upload-icon ctrl-upload ' + self.options.controls['upload-style'] + '">' + self.options.controls['upload-content'] + '</span>');
-          html.push('<span class="file-remove-icon ctrl-remove ' + self.options.controls['remove-style'] + '">' + self.options.controls['remove-content'] + '</span>');
-					html.push('</span>');
           break;
         case 'text': // 文件列表
         default:
-          html.push('<a class="file-name" href="' + file.url + (self.options.download === true ? '" download="' + file.name : '') + '"><i class="file-type-icon fa fa-file-text-o fa-fw"></i>' + file.name + '</a>');
-					html.push('<span class="file-status-icon">')
-          html.push(self.getStatusIcon(file.status));
-					html.push('</span>');
-					html.push('<span class="upload-file-control">');
-					html.push('<span class="file-upload-icon ctrl-upload ' + self.options.controls['upload-style'] + '">' + self.options.controls['upload-content'] + '</span>');
-          html.push('<span class="file-remove-icon ctrl-remove ' + self.options.controls['remove-style'] + '">' + self.options.controls['remove-content'] + '</span>');
-          html.push('</span>');
+          html.push('<a class="file-name" ' + (!self.options.download ? '' : 'href="' + file.url + '" download="' + file.name + '"') + '><span class="file-type-icon">' + self.options.icon['file-icon'] + '</span>' + file.name + '</a>');
       }
+      
+      html.push('<span class="file-status-icon">')
+      html.push(self.getStatusIcon(file.status));
+      html.push('</span>');
+      html.push('<span class="upload-file-control ' + (self.options.controls['full'] === true ? 'full' : '') + '">');
+      if (self.options.controls['preview'] === true) {
+        html.push('<span class="file-preview-icon ctrl-preview ' + self.options.controls['preview-style'] + '">' + self.options.controls['preview-content'] + '</span>');
+      }
+      html.push('<span class="file-upload-icon ctrl-upload ' + self.options.controls['upload-style'] + '">' + self.options.controls['upload-content'] + '</span>');
+      html.push('<span class="file-remove-icon ctrl-remove ' + self.options.controls['remove-style'] + '">' + self.options.controls['remove-content'] + '</span>');
+      html.push('</span>');
       
       html.push('</li>');
       return html.join('\n');
@@ -1117,7 +1108,6 @@
         	self.element.children('.picture-choose').removeClass('hide');
         }
       }
-      
       return true;
     },
 		/**
@@ -1128,19 +1118,19 @@
 			const self = this;
 			switch (status) {
 			  case UploadDefault:
-				  return self.options['status-icon']['default-icon'];
+				  return self.options.icon['default-icon'];
 					break;
 				case Uploading:
-				  return self.options['status-icon']['uploading-icon'];
+				  return self.options.icon['uploading-icon'];
 					break;
 				case UploadFinish:
-				  return self.options['status-icon']['finish-icon'];
+				  return self.options.icon['finish-icon'];
 					break;
 				case UploadSuccess:
-				  return self.options['status-icon']['success-icon'];
+				  return self.options.icon['success-icon'];
 					break;
 				case UploadFailure:
-			    return self.options['status-icon']['failure-icon'];
+			    return self.options.icon['failure-icon'];
 					break;
 			  default:
 					return '';
@@ -1166,7 +1156,25 @@
         default:
           return 'is-warning';
       }
-    }
+    },
+    /**
+     * @param {object} url
+     * @param {object} callback
+     * @description 获取图片真实宽高
+     */
+    getImageSize: function(url, callback){
+    	var img = new Image();
+    	img.src = url;
+    	
+    	// 判断是否有缓存数据
+    	if (img.complete){
+    	  callback(img.width, img.height);
+    	} else {
+    	  img.onload = function(){
+          callback(img.width, img.height);
+        }
+      }
+    },
   };
 
   $.fn.fileUpload = function(option) {
@@ -1199,7 +1207,6 @@
 		});
 		
 		if (typeof value !== 'undefined') {
-		  // noinspection JSUnusedAssignment
 		  return value;
 		} else {
 		  return chain;
