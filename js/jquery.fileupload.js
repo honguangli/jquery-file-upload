@@ -370,23 +370,21 @@
       }).on('click', '.ctrl-prev', function() {
         // 预览上一张图片事件
         const $curr = $('.picture-preview .picture-wrap li.on', self.element);
+        $curr.removeClass('on');
         if ($curr.prev().length === 0) {
-          $curr.removeClass('on');
           $('.picture-preview .picture-wrap li:last', self.element).addClass('on');
           return false
         }
-        $curr.removeClass('on');
         $curr.prev().addClass('on');
         return false;
       }).on('click', '.ctrl-next', function() {
         // 预览下一张图片事件
         const $curr = $('.picture-preview .picture-wrap li.on', self.element);
+        $curr.removeClass('on');
         if ($curr.next().length === 0) {
-          $curr.removeClass('on');
           $('.picture-preview .picture-wrap li:first', self.element).addClass('on');
           return false
         }
-        $curr.removeClass('on');
         $curr.next().addClass('on');
         return false;
       });
@@ -398,16 +396,18 @@
     openPreview: function(key) {
       const self = this;
       const $wrap = self.element.children('.picture-preview');
-      const wrapWidth = $wrap.outerWidth(true);
-      const wrapHeight = $wrap.outerHeight(true);
+      const wrapWidth = Math.round($wrap.outerWidth(true));
+      const wrapHeight = Math.round($wrap.outerHeight(true));
       const pics = [];
       for (let i = 0; i < self.fileList.length; i++) {
         const url = self.fileList[i].url || self.fileList[i].originUrl;
         const on = self.fileList[i].key === key;
-        const left = (wrapWidth - self.fileList[i].width) / 2;
-        const top = (wrapHeight - self.fileList[i].height) / 2;
+        const width = Math.round(self.fileList[i].width);
+        const height = Math.round(self.fileList[i].height);
+        const left = Math.round((wrapWidth - width) / 2);
+        const top = Math.round((wrapHeight - height) / 2);
         pics.push('<li class="' + (on ? 'on' : '') + '">');
-        pics.push('<img src="' + url + '" style="width: ' + self.fileList[i].width + 'px; height: ' + self.fileList[i].height + 'px; left:' + left + 'px; top: ' + top + 'px"/>');
+        pics.push('<img src="' + url + '" style="width: ' + width + 'px; height: ' + height + 'px; left:' + left + 'px; top: ' + top + 'px"/>');
         pics.push('</li>');
       }
       $wrap.children('.picture-wrap:first').html(pics.join('\n'));
