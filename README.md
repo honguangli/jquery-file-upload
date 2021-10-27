@@ -5,6 +5,9 @@
 
 > 默认图标为font-awesome，若想使用其他图标库，可通过本插件提供的配置参数修改图标内容。详见状态图标、控制器图标
 
+![avatar](https://github.com/honguangli/jquery-file-upload/blob/main/img/1.PNG)
+![avatar](https://github.com/honguangli/jquery-file-upload/blob/main/img/2.PNG)
+
 ### 用法
 $(elem).fileUpload(option);
 

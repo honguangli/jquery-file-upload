@@ -920,8 +920,8 @@
 				'url': url || '',                  // 文件地址
 				'originUrl': originUrl || '',      // 预览地址
 				'originData': originData || null,  // 预览数据
-        'width': 0,                        // 图片宽度
-        'height': 0,                       // 图片高度
+        'width': 640,                      // 图片宽度，默认640px
+        'height': 480,                     // 图片高度，默认480px
 			}
       
       // 若文件名为空，则尝试取url地址，若地址为空，则默认显示“文件”+key
@@ -933,8 +933,6 @@
         case 'picture': // 图片列表
         case 'picture-card': // 图片卡片列表
         case 'picture-placeholder': // 图片卡片占位列表
-          file.width = 640; // 设置默认宽度
-          file.height = 480; // 设置默认高度
           self.getImageSize(file.url || file.originUrl, function(w, h) {
             file.width = w;
             file.height = h;
