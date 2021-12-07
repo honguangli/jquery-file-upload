@@ -89,7 +89,7 @@
       'remove': true,                                                        // 删除按钮
       'remove-style': '',                                                    // 删除按钮样式
       'remove-content': '<i class="fa fa-trash fa-fw"></i>',                 // 删除按钮内容
-			'preview':false,                                                       // 预览按钮
+			'preview': false,                                                      // 预览按钮
 			'preview-style': '',                                                   // 预览按钮样式
 			'preview-content': '<i class="fa fa-search-plus fa-fw"></i>',          // 预览按钮内容
 			'picture-choose': false,                                               // 图片选择卡片
@@ -121,6 +121,7 @@
     'on-clear': null,      // 清空前的钩子
     'on-change': null,     // 数据变更的钩子
     'on-msg': null,        // 提示消息的钩子
+    'on-preview': null,    // 图片预览的钩子
   };
   
   // 图片列表默认配置
@@ -336,6 +337,15 @@
         return false;
       }).on('click', '.ctrl-preview', function() {
         // 图片预览事件
+        
+        // 图片预览的钩子
+        if (self.options['on-preview'] != null && $.isFunction(self.options['on-preview'])) {
+          // return false可拒绝默认预览行为
+          if (self.options['on-preview']($(this).closest('.file-item').index(), self.fileList) === false) {
+            return false
+          }
+        }
+        
         const $item = $(this).closest('.file-item');
         self.openPreview($item.attr('data-key'));
         return false;
